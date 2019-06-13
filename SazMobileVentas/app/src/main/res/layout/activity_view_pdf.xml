@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ViewPDFActivity">
+
+
+   <ScrollView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content">
+
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:background="#1e1e1e"
+           android:orientation="vertical"
+           >
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="horizontal"
+               >
+
+               <TextView
+
+                   android:layout_width="50dp"
+                   android:layout_height="10dp"
+                   android:background="#ffff"
+                   android:layout_marginTop="15dp"
+                   />
+
+               <Button
+                   android:id="@+id/btnWhastapp"
+                   android:layout_width="80dp"
+                   android:layout_height="80dp"
+                   android:background="@drawable/addphone"
+                   android:layout_marginTop="15dp"
+                   />
+               <Button
+                   android:id="@+id/btnFacebook"
+                   android:layout_width="80dp"
+                   android:layout_height="80dp"
+                   android:layout_marginLeft="10dp"
+                   android:background="@drawable/compartir"
+                   android:layout_marginTop="15dp"
+                   />
+
+
+
+
+               <TextView
+                   android:id="@+id/edtCorreo"
+                   android:layout_width="match_parent"
+                   android:layout_height="10dp"
+                   android:background="#ffff"
+                   android:layout_marginTop="15dp"
+                   />
+           </LinearLayout>
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="vertical"
+
+               >
+
+              <EditText
+                  android:id="@+id/edtNombre"
+                  android:layout_width="300dp"
+                  android:layout_marginTop="10dp"
+                  android:layout_height="25dp"
+                  android:gravity="center"
+                  android:layout_gravity="center"
+                  android:hint="Nombre cliente "
+                  android:background="#ffff"
+                  />
+           </LinearLayout>
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="vertical"
+
+               >
+
+               <EditText
+                   android:id="@+id/edtNumero"
+                   android:layout_width="300dp"
+                   android:layout_marginTop="10dp"
+                   android:layout_height="25dp"
+                   android:gravity="center"
+                   android:layout_gravity="center"
+                   android:inputType="number"
+                   android:hint="Numero telefonico "
+                   android:background="#ffff"
+                   />
+           </LinearLayout>
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="vertical"
+
+               >
+
+               <EditText
+                   android:id="@+id/edtMail"
+                   android:layout_width="300dp"
+                   android:layout_marginTop="10dp"
+                   android:layout_height="25dp"
+                   android:gravity="center"
+                   android:layout_gravity="center"
+                   android:hint="Correo electronico  "
+                   android:background="#ffff"
+                   />
+           </LinearLayout>
+
+
+           <com.github.barteksc.pdfviewer.PDFView
+               android:id="@+id/pdfView"
+               android:layout_marginTop="25dp"
+               android:layout_width="match_parent"
+               android:layout_height="900dp"
+               android:background="#1e1e1e"
+               />
+
+       </LinearLayout>
+
+
+   </ScrollView>
+
+</LinearLayout>
