@@ -42,22 +42,21 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:background="#f4f4f3"
+
                     android:orientation="horizontal">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="20dp"
+                        android:layout_weight="1"
                         android:text="Estilo"
-
                         android:textColor="#3f3f40"
                         android:textSize="20dp" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="120dp"
+                        android:layout_weight="1"
                         android:text="Color"
                         android:textColor="#3f3f40"
                         android:textSize="20dp" />
@@ -75,25 +74,25 @@
 
                     <EditText
                         android:id="@+id/sp2"
-                        android:layout_width="185dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
                         android:layout_marginTop="0dp"
                         android:background="#e2e2de"
-                        android:hint="Etilo"
+                        android:hint="Estilo"
+                        android:layout_weight="1"
                         android:textColor="#3f3f40"
                         android:textSize="25dp"
-
-
+                        android:inputType="textCapCharacters"
                         />
+
 
                     <Spinner
                         android:id="@+id/sp"
                         style="@style/spinner_style"
-                        android:layout_width="210dp"
-
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
+                        android:layout_weight="1"
                         android:clickable="true" />
 
 
@@ -107,18 +106,17 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
+                        android:layout_weight="1"
                         android:text="Acabado"
                         android:textColor="#3f3f40"
                         android:textSize="20dp" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="110dp"
-
+                        android:layout_weight="1"
                         android:text="Marca"
                         android:textColor="#3f3f40"
                         android:textSize="20dp" />
@@ -136,16 +134,19 @@
                     <Spinner
                         android:id="@+id/sp3"
                         style="@style/spinner_style"
-                        android:layout_width="180dp"
-                        android:layout_height="wrap_content" />
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        />
 
 
                     <Spinner
                         android:id="@+id/sp4"
                         style="@style/spinner_style"
-                        android:layout_width="205dp"
-
-                        android:layout_height="wrap_content"></Spinner>
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        />
 
 
                 </LinearLayout>
@@ -253,13 +254,11 @@
                         android:orientation="horizontal"
                         >
                         <TextView
-
                             android:textColor="#3f3f40"
                             android:textSize="17dp"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginLeft="40dp"
                             android:text="Unidades:"
 
                             />
@@ -267,8 +266,7 @@
                             android:id="@+id/unidadesTXT"
                             android:textColor="#3f3f40"
                             android:textSize="17dp"
-                            android:layout_marginLeft="2dp"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="0"
@@ -276,25 +274,24 @@
                             />
                         <TextView
 
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:textColor="#3f3f40"
                             android:textSize="17dp"
-                            android:layout_marginLeft="25dp"
-                            android:text="total:"
+                            android:text="Subtotal:"
                             />
+
                         <TextView
-                            android:id="@+id/importeTXT"
-                            android:layout_width="wrap_content"
+                            android:id="@+id/totalTXT"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:drawableLeft="@drawable/pesos"
-                            android:text="0"
-                            android:textSize="17dp"
-                            android:layout_marginLeft="0dp"
                             android:layout_weight="1"
+                            android:text=""
                             android:textColor="#3f3f40"
-                             />
+                            android:textSize="17dp"
+                            android:textStyle="bold"
+                            />
 
 
                     </LinearLayout>
@@ -307,52 +304,42 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:layout_marginLeft="2dp"
                             android:text="Existencia"
                             android:textColor="#3f3f40"
-                            android:textSize="20dp" />
+                            android:textSize="20dp"
+                            android:layout_weight="1"
+                            />
 
                         <TextView
 
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:layout_marginLeft="18dp"
                             android:text="Precio"
                             android:textColor="#3f3f40"
-                            android:textSize="20dp" />
+                            android:textSize="20dp"
+                            android:layout_weight="1"
+                            />
 
                         <TextView
 
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:layout_marginLeft="28dp"
                             android:text="Descuento"
                             android:textColor="#3f3f40"
-                            android:textSize="20dp" />
+                            android:textSize="20dp"
+                            android:layout_weight="1"
+                            />
 
-                        <TextView
 
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginLeft="23dp"
-                            android:text="Total"
-                            android:textColor="#3f3f40"
-                            android:textSize="20dp" />
 
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
 
-                    </LinearLayout>
 
 
                     <LinearLayout
@@ -364,59 +351,40 @@
 
                         <TextView
                             android:id="@+id/existenciasTXT"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:layout_marginLeft="40dp"
                             android:text=""
-                            android:textColor="#ff0000"
                             android:textSize="20dp"
-                            android:textStyle="bold" />
+                            android:layout_weight="1"
+                            android:textColor="#ff0000"
+                            />
 
                         <TextView
                             android:id="@+id/precioTXT"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:layout_marginLeft="43dp"
                             android:text=""
                             android:textColor="#3f3f40"
                             android:textSize="20dp"
-                            android:textStyle="bold" />
+                            android:layout_weight="1"
+                            />
 
                         <TextView
                             android:id="@+id/descuentoTXT"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:layout_marginLeft="28dp"
-                            android:text=""
-                            android:textColor="#f93f3f40"
-                            android:textSize="20dp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/totalTXT"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginLeft="23dp"
                             android:text=""
                             android:textColor="#3f3f40"
                             android:textSize="20dp"
-                            android:textStyle="bold" />
+                            android:layout_weight="1"
+                            />
 
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="horizontal"
-
-                            >
 
 
-                        </LinearLayout>
 
 
                     </LinearLayout>
@@ -432,11 +400,38 @@
                 </LinearLayout>
 
 
+                <TextView
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Total a pagar:"
+                    android:textColor="#3f3f40"
+                    android:textSize="27dp"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    />
+                <TextView
+                    android:id="@+id/importeTXT"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/pesos"
+                    android:text="0"
+                    android:textSize="22dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:textColor="#3f3f40"
+                    android:textStyle="bold"
+                    />
 
 
 
 
 
+                <TextView
+                    android:layout_width="1000dp"
+                    android:layout_height="5dp"
+                    android:layout_marginTop="10dp"
+                    android:background="#004d73" />
 
 
                 <LinearLayout
@@ -588,7 +583,7 @@
                         android:layout_width="150dp"
                         android:textSize="25dp"
                         android:drawableLeft="@drawable/pesos"
-                        android:inputType="number"
+                        android:inputType="numberDecimal"
                         android:layout_height="wrap_content"
                         android:singleLine="false"
                         android:hint="0.0"
@@ -632,6 +627,17 @@
 
                         />
 
+                    <TextView
+                        android:id="@+id/txtSaldoRestante"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:gravity="center"
+                        android:layout_marginTop="5dp"
+                        android:textColor="#3f3f40"
+                        android:text=""
+                        android:textSize="20dp"
+                        />
 
                     <TextView
                         android:layout_width="match_parent"

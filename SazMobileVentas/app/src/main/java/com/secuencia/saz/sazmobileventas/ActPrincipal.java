@@ -385,7 +385,7 @@ public class ActPrincipal extends AppCompatActivity {
 
         try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            st.executeUpdate("insert into logdia (nombre, fecha, tienda, hora,origen, tipo, idEmpleado, caja, id, llave, autoriza) values ('"+nombreUsuario+"', getDate(),1,'"+FechaHora[1]+"', 1, 'ENTRADA',"+numeroUsuario+",1 ,92911, newId(), 0 );");
+            st.executeUpdate("insert into logdia (nombre, fecha, tienda, hora,origen, tipo, idEmpleado, caja, id, llave, autoriza) values ('"+nombreUsuario+"', getDate(),1,'getDate()', 1, 'ENTRADA',"+numeroUsuario+",1 ,92911, newId(), 0 );");
 
 
 

@@ -42,7 +42,7 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
     public static ConexionBDCliente bdc=new ConexionBDCliente();
     ConexionSqlServer conex=new ConexionSqlServer();
     int existencias=0;
-
+    double precioUnidad;
     ArrayList<ModeloResumen> listResumen;
     Context context;
 
@@ -76,6 +76,7 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
         holder.acabado.setText(listResumen.get(position).getAcabado());
 
         existenciasEnMiTienda(holder);
+        consultarPrecio(holder);
 
         holder.foto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,6 +140,7 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
             }
         });
 
+
         holder.btnMas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,18 +149,15 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
                 try {
 
                     if(existencias>0) {
-                        DecimalFormat formato= new DecimalFormat("#.##");
+
                         double precioUnidad=(Double.parseDouble(holder.total.getText().toString())/cantidad);
                         cantidad++;
                         holder.cant.setText(String.valueOf(cantidad));
 
-                        double precio=Double.parseDouble(holder.total.getText().toString())+precioUnidad;
-                        holder.total.setText(String.valueOf(formato.format(precio)));
+                        double  precio=Double.parseDouble(holder.total.getText().toString())+precioUnidad;
+                        holder.total.setText(String.valueOf(precio));
                         upDate(holder,cantidad,precio);
                         upDateExistencias(holder);
-
-
-
 
                     }else{
 
@@ -186,7 +185,7 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
             public void onClick(View v) {
 
                 try {
-                    DecimalFormat formato= new DecimalFormat("#.##");
+
                     if(Integer.parseInt(holder.cant.getText().toString())!=0 || Integer.parseInt(holder.cant.getText().toString())!=1 ) {
                         int cantidad = Integer.parseInt(holder.cant.getText().toString());
                      if(Integer.parseInt(holder.cant.getText().toString())>=1) {
@@ -194,13 +193,14 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
                              cantidad--;
                              holder.cant.setText(String.valueOf(cantidad));
                              double precio = Double.parseDouble(holder.total.getText().toString()) - precioUnidad;
-                             holder.total.setText(String.valueOf(formato.format(precio)));
+                             holder.total.setText(String.valueOf(precio));
                              upDate(holder, cantidad, precio);
                              upDateExistenciasMenos(holder);
 
                      }
                     }
                 }catch(Exception e){
+                    e.getMessage();
                     Toast.makeText(context, "error No.2_resumen ", Toast.LENGTH_SHORT).show();
                 }
 
@@ -356,6 +356,21 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
         db.close();
     }
     */
+    public void consultarPrecio(final ViewHolderResumen holder){
+        try {
+            Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
+            ResultSet rs = st.executeQuery("select precio from precios where barcode='"+holder.bar.getText().toString()+"'");
+
+
+            while (rs.next()) {
+                precioUnidad=rs.getDouble(1);
+            }
+
+
+        } catch (Exception e) {
+
+        }
+    }
 
     @Override
     public int getItemCount() {

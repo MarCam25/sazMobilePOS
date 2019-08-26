@@ -71,6 +71,7 @@ public class Principal extends AppCompatActivity {
     public static int hiloCantidad = 0, hiloCantidadC = 0;
     String fechaContrato;
     String pass = " ";
+    public static  boolean scannPass=false;
    public static boolean banco=false;
     int verificador;
     public String empresa = null;

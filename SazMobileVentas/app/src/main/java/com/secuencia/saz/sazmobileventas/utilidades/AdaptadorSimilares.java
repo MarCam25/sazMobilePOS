@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.secuencia.saz.sazmobileventas.Modelo.Similar;
 import com.secuencia.saz.sazmobileventas.menu;
 import com.secuencia.saz.sazmobileventas.Modelo.DatosLupita;
 import com.secuencia.saz.sazmobileventas.Modelo.ModeloSimilar;
@@ -47,9 +49,18 @@ public class AdaptadorSimilares  extends RecyclerView.Adapter<AdaptadorSimilares
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Similar simi=new Similar();
+                simi.setColor(holder.color.getText().toString());
+                simi.setAcabado(holder.acabado.getText().toString());
+                simi.setMarca(holder.marca.getText().toString());
+                simi.setCorrida(holder.punto.getText().toString());
+                simi.setPunto(holder.corrida.getText().toString());
+
+
+
                 Principal.similarPass=true;
                 Principal.passConsulta=true;
-                Principal.menu=true;
+                Principal.scannPass=true;
                 Intent intent = new Intent(holder.context, menu.class);
                 DatosLupita dl=new DatosLupita();
                 dl.setBarcode(holder.barcode.getText().toString());

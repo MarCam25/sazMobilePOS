@@ -69,11 +69,20 @@ public class Configuraciones extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+
+
+
                 dropCheckBuscador();
                 dropCheckIva();
 
                 dropCheckBuscador();
                 dropCheckIva();
+
+                deleteSimilares();
+
+
+
+
 
                 if(CheckBusqueda.isChecked()==true){
                     insertCheckBuscador();
@@ -131,7 +140,7 @@ public class Configuraciones extends AppCompatActivity {
 
 
 
-                if(checkColor.isChecked() == true){
+                if(checkColor.isChecked()==true){
                     consultarSimilares("color");
                 } else if(checkColor.isChecked()==false){
                     deleteSimilar("color");
@@ -458,6 +467,16 @@ public class Configuraciones extends AppCompatActivity {
 
 
 
+
+    }
+
+
+    public void deleteSimilares(){
+        ConexionSQLiteHelper conn = new ConexionSQLiteHelper(this, "db tienda", null, 1);
+        SQLiteDatabase db = conn.getWritableDatabase();
+
+        String sql="DELETE FROM "+ Utilidades.TABLA_SIMILAR;
+        db.execSQL(sql );
 
     }
 

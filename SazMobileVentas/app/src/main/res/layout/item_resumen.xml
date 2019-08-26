@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#f4f4f3"
     android:theme="@style/AppTheme"
@@ -11,7 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="#f4f4f3"
-        >
+        tools:ignore="MissingConstraints">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -140,8 +142,8 @@
 
                         <Button
                             android:id="@+id/btnMas"
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
                             android:text="+"
                             android:textSize="30dp"
                             android:textColor="#ffffff"
@@ -163,8 +165,8 @@
 
                         <Button
                             android:id="@+id/btnMenos"
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
                             android:text="-"
                             android:layout_marginLeft="5dp"
                             android:textColor="#ffffff"
@@ -244,11 +246,10 @@
 
                     <TextView
                         android:id="@+id/idTotal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="12"
+                        android:layout_width="110dp"
+                        android:layout_height="40dp"
+                        android:text="47329,8000"
                         android:textSize="20dp"
-
                         android:textColor="#545151"
                         android:layout_marginTop="1dp"
                         android:textStyle="bold"
@@ -304,7 +305,7 @@
                     android:layout_width="150dp"
                     android:layout_marginTop="10dp"
                     android:layout_height="55dp"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginLeft="0dp"
                     android:textColor="#ffffff"
                     android:background="@drawable/btn_buscar"
                     android:text="FOTO"
@@ -317,7 +318,7 @@
                     android:layout_marginTop="10dp"
                     android:textColor="#ffffff"
                     android:background="@drawable/btn_buscar"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginLeft="0dp"
                     android:text="ELIMINAR"
                     />
 

@@ -56,6 +56,8 @@ import com.secuencia.saz.sazmobileventas.utilidades.Utilidades;
 
 import org.w3c.dom.Text;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -101,6 +103,8 @@ public class Ventas extends Fragment {
     String metodoPago;
     double efectivoPagado=0.0;
 
+    String where=" where ";
+
     static Double puntoBar, puntoCont;
     public static ModeloEmpresa me=new ModeloEmpresa();
     public static ConexionBDCliente bdc=new ConexionBDCliente();
@@ -112,7 +116,7 @@ public class Ventas extends Fragment {
     static  String estiloBar="";
     TextView edtCodigo;
     String variableS,descuento;
-    static  boolean scannPass=false;
+
     String fechaUlti, horaUlti;
     int iva=0;
 
@@ -225,6 +229,7 @@ public class Ventas extends Fragment {
 
     String rfc, razon,fechaTicket;
 
+    TextView txtSaldoRestante;
 
 
 
@@ -280,6 +285,7 @@ public class Ventas extends Fragment {
         forma=(TextView)root.findViewById(R.id.formaPagoLabel);
         spSocio=(Spinner)root.findViewById(R.id.spSocio);
         btnSimilares=(Button)root.findViewById(R.id.btnSimilar);
+        txtSaldoRestante=(TextView)root.findViewById(R.id.txtSaldoRestante);
         btnOtras=(Button)root.findViewById(R.id.btnOtras);
         unidadesTXT.setText("0");
         importeTXT.setText("0");
@@ -669,7 +675,7 @@ public class Ventas extends Fragment {
                               efectivoTxt.setText(null);
                               restar=true;
                               pagado=false;
-                              Toast.makeText(getActivity(),"Te falta $"+resultado+" Para finalizar la compra",Toast.LENGTH_LONG).show();
+                              txtSaldoRestante.setText("Monto pendiente: "+resultado );
 
                               // no se borra la tabla sqLite recive para metros y los regresa
                           }
@@ -995,67 +1001,99 @@ try {
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
 
                     buscador=0;
+
                     buscador();
+
+
                     limpiarListas();
                     limpiarCajas();
                     ReinicarContadores();
-                    Toast toast =new  Toast(getActivity());
+
+                    Toast gif =new  Toast(getActivity());
                     pl.droidsonroids.gif.GifImageView view=new  pl.droidsonroids.gif.GifImageView(getActivity());
                     view.setImageResource(R.drawable.loading);
-                    toast.setView(view);
-                    toast.show();
-                    puntos.clear();
-                    listaBancos.clear();
+                    gif.setView(view);
+                    gif.show();
 
-                    spBanco.setAdapter(null);
+                    Toast toaste =new  Toast(getActivity());
+                    pl.droidsonroids.gif.GifImageView viewe=new  pl.droidsonroids.gif.GifImageView(getActivity());
+                    view.setImageResource(R.drawable.loading);
+                    toaste.setView(view);
+                    toaste.show();
+
+                    Toast toast = Toast.makeText(getActivity(), "Cargando...", Toast.LENGTH_LONG);
+                    TextView x = (TextView) toast.getView().findViewById(android.R.id.message);
+                    x.setTextColor(Color.YELLOW); toast.show();
+
+                    puntos.clear();
                     mismoDispositivo();
 
 
                     punto.setAdapter(null);
 
                     contarSp();
-                    if(colorCantidad > 0) {
-                        if (scannPass == true && buscador == 0) {
+                    if(colorCantidad>0) {
+                        if (Principal.scannPass == true && buscador == 0) {
                             llenarSp();
                             ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, lista);
                             spColor.setAdapter(adapter);
                             spColor.setSelection(obtenerPosicionItem(spColor, colorBar));
-                        } else if (scannPass == false && colorCantidad == 1 && buscador == 0) {
+                        } else if (Principal.scannPass == false && colorCantidad == 1 && buscador == 0) {
                             llenarSp();
                             ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, lista);
                             spColor.setAdapter(adapter);
                             spColor.setSelection(1);
 
-                        } else if (scannPass == false && colorCantidad > 1 && buscador == 0) {
+
+                        } else if (Principal.scannPass == false && colorCantidad > 1 && buscador == 0) {
                             llenarSp();
                             ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, lista);
                             spColor.setAdapter(adapter);
 
-                        } else if (buscador == 1) {
+                        } else if (buscador == 1 && Principal.scannPass==false) {
                             buscarMarcas();
 
                             if (marcaCantidad == 1) {
 
+
                                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaMarca);
+                              /*  spinnerDialog=new SpinnerDialog(getActivity(),listaMarca,"Selecciona marca ","ok");// With 	Animation
+                                spinnerDialog.setCancellable(true); // for cancellable
+                                spinnerDialog.setShowKeyboard(false); */
                                 spMarca.setAdapter(adapter);
                                 spMarca.setSelection(1);
+
+
 
                             } else if (marcaCantidad > 1) {
 
                                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaMarca);
                                 spMarca.setAdapter(adapter);
+
+/*
+                                spinnerDialog=new SpinnerDialog(getActivity(),listaMarca,"Seleccione marca","ok");// With 	Animation
+                                spinnerDialog.setCancellable(true); // for cancellable
+                                spinnerDialog.setShowKeyboard(false);*/
+
                             }
 
-
-                        } else if (scannPass == false && buscador == 0) {
+                        } else if (Principal.scannPass == false && buscador == 0) {
                             llenarSp();
                             ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, lista);
                             spColor.setAdapter(adapter);
-                            spColor.setSelection(1);
+
+                        }else if(buscador == 1 && Principal.scannPass==true){
+                            buscarMarcas();
+                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaMarca);
+                            spMarca.setAdapter(adapter);
+                            spMarca.setSelection(obtenerPosicionItem(spMarca, marcaBar));
+
                         }
-
-
+                    }else{
+                        Toast.makeText(getActivity(),"Estilo no valido",Toast.LENGTH_LONG).show();
                     }
+
+
                     return true;
                 }
                 return false;
@@ -1068,6 +1106,9 @@ try {
         spColor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Toast toast = Toast.makeText(getActivity(), "Cargando...", Toast.LENGTH_LONG);
+                TextView x = (TextView) toast.getView().findViewById(android.R.id.message);
+                x.setTextColor(Color.YELLOW); toast.show();
                 listaAcabado.clear();
                 listaMarca.clear();
                 listaCorrida.clear();
@@ -1082,22 +1123,32 @@ try {
                 spAcabado.setAdapter(null);
                 listaAcabado.clear();
 
-                llenarSp3();
 
-                if(scannPass==true){
+                contarSp3();
+
+                if(Principal.scannPass==true){
+                    llenarSp3();
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaAcabado);
                     spAcabado.setAdapter(adapter);
                     spAcabado.setSelection(obtenerPosicionItem(spAcabado,acabadoBar));
-                }else if(scannPass==false && acabadoCantidad==1){
+
+                }else if(Principal.scannPass==false && acabadoCantidad==1){
+                    llenarSp3();
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaAcabado);
                     spAcabado.setAdapter(adapter);
                     spAcabado.setSelection(1);
 
-                }else if(scannPass==false && acabadoCantidad>1){
+
+
+                }else if(Principal.scannPass==false && acabadoCantidad>1){
+                    llenarSp3();
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaAcabado);
                     spAcabado.setAdapter(adapter);
 
+
+
                 }
+
 
             }
 
@@ -1126,17 +1177,21 @@ try {
 
                 ReinicarContadores();
 
-                llenarSp4();
-                if(scannPass==true){
+                contarSp4();
+                if(Principal.scannPass==true){
+                    llenarSp4();
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaMarca);
                     spMarca.setAdapter(adapter);
                     spMarca.setSelection(obtenerPosicionItem(spMarca,marcaBar));
-                }else if(scannPass==false && marcaCantidad==1){
+                }else if(Principal.scannPass==false && marcaCantidad==1){
+                    llenarSp4();
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaMarca);
                     spMarca.setAdapter(adapter);
                     spMarca.setSelection(1);
 
-                }else if(scannPass==false && marcaCantidad>1){
+
+                }else if(Principal.scannPass==false && marcaCantidad>1){
+                    llenarSp4();
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaMarca);
                     spMarca.setAdapter(adapter);
 
@@ -1153,60 +1208,71 @@ try {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                Toast toast = Toast.makeText(getActivity(), "Cargando...", Toast.LENGTH_LONG);
-                TextView x = (TextView) toast.getView().findViewById(android.R.id.message);
-                x.setTextColor(Color.YELLOW); toast.show();
+                try {
+                    Toast toast = Toast.makeText(getActivity(), "Cargando...", Toast.LENGTH_LONG);
+                    TextView x = (TextView) toast.getView().findViewById(android.R.id.message);
+                    x.setTextColor(Color.YELLOW);
+                    toast.show();
 
 
-
-                spCorrida.setAdapter(null);
-                punto.setAdapter(null);
-                listaCorrida.clear();
-                puntos.clear();
-                limpiarCajas();
-                ReinicarContadores();
-                spCorrida.setAdapter(null);
-                listaCorrida.clear();
-
-
-                contarSp5();
+                    spCorrida.setAdapter(null);
+                    punto.setAdapter(null);
+                    listaCorrida.clear();
+                    puntos.clear();
+                    limpiarCajas();
+                    ReinicarContadores();
+                    spCorrida.setAdapter(null);
+                    listaCorrida.clear();
 
 
-                if(scannPass==true && buscador==0){
-                    llenarSp5();
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaCorrida);
-                    spCorrida.setAdapter(adapter);
-                    spCorrida.setSelection(obtenerPosicionItem(spCorrida,corridaBar));
-                }else if(scannPass==false && corridaCantidad==1 && buscador==0){
-                    llenarSp5();
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaCorrida);
-                    spCorrida.setAdapter(adapter);
-                    spCorrida.setSelection(1);
-
-                }else if(scannPass==false && corridaCantidad>1 && buscador==0){
-                    llenarSp5();
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaCorrida);
-                    spCorrida.setAdapter(adapter);
-
-                }else if(buscador==1){
-
-                    obtenerCorrida();
-                    if(corridaCantidad==1){
-                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaCorrida);
+                    contarSp5();
+                    if (Principal.scannPass == true && buscador == 0) {
+                        llenarSp5();
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaCorrida);
+                        spCorrida.setAdapter(adapter);
+                        spCorrida.setSelection(obtenerPosicionItem(spCorrida, corridaBar));
+                    } else if (Principal.scannPass == false && corridaCantidad == 1 && buscador == 0) {
+                        llenarSp5();
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaCorrida);
                         spCorrida.setAdapter(adapter);
                         spCorrida.setSelection(1);
-                    }else if(corridaCantidad>1){
-                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaCorrida);
-                        spCorrida.setAdapter(adapter);
-                    }
 
-                }else if(scannPass==false && buscador==0){
-                    llenarSp5();
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaCorrida);
-                    spCorrida.setAdapter(adapter);
+                    } else if (Principal.scannPass == false && corridaCantidad > 1 && buscador == 0) {
+                        llenarSp5();
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaCorrida);
+                        spCorrida.setAdapter(adapter);
+
+                    } else if (buscador == 1 && Principal.scannPass==false) {
+                        llenarSp5();
+                        obtenerCorrida();
+                        if(corridaCantidad==1){
+                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaCorrida);
+                            spCorrida.setAdapter(adapter);
+                            spCorrida.setSelection(1);
+                        }else if(corridaCantidad>1){
+                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaCorrida);
+                            spCorrida.setAdapter(adapter);
+                        }
+
+                    } else if (Principal.scannPass == false && buscador == 0) {
+                        llenarSp5();
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaCorrida);
+                        spCorrida.setAdapter(adapter);
+
+                    }else if (buscador == 1 && Principal.scannPass==true) {
+                        llenarSp5();
+                        obtenerCorrida();
+
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaCorrida);
+                        spCorrida.setAdapter(adapter);
+                        spCorrida.setSelection(obtenerPosicionItem(spCorrida, corridaBar));
+
+
+
+                    }
+                }catch(Exception e){
 
                 }
-
 
             }
 
@@ -1230,37 +1296,39 @@ try {
                 punto.setAdapter(null);
 
                 //   llenarExistencias();
-                if(scannPass==true && buscador==0 ){
+                contarPuntos();
+                if(Principal.scannPass==true && buscador==0 ){
                     llenarTabla();
                     llenarPuntos();
 
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item_punto, puntos);
                     punto.setAdapter(adapter);
                     punto.setSelection(obtenerPosicionItem(punto,String.valueOf(puntoBar)));
-                }else if(scannPass==false && puntosCantidad==1 && buscador==0){
-                    llenarTabla();
-                    llenarPuntos();
-
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item_punto, puntos);
-                    punto.setAdapter(adapter);
-                    punto.setSelection(1);
-
-                }else if(scannPass==false && puntosCantidad>1 && buscador==0){
+                    Principal.scannPass=false;
+                }else if(Principal.scannPass==false && puntosCantidad==1 && buscador==0){
                     llenarTabla();
                     llenarPuntos();
 
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item_punto, puntos);
                     punto.setAdapter(adapter);
 
-                }else if(buscador==1){
+
+                }else if(Principal.scannPass==false && puntosCantidad>1 && buscador==0){
+                    llenarTabla();
+                    llenarPuntos();
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item_punto, puntos);
+                    punto.setAdapter(adapter);
+
+                }else if(buscador==1 && Principal.scannPass==false){
                     traerDatosProducto();
                     llenarPuntos();
                     if(puntosCantidad==1){
-
+                        llenarTabla();
 
                         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item_punto, puntos);
                         punto.setAdapter(adapter);
-                        punto.setSelection(1);
+
 
                     }else if( puntosCantidad>1){
                         llenarTabla();
@@ -1272,12 +1340,24 @@ try {
                     }
 
 
-                }else if(scannPass==false && buscador==0){
+                }else if(Principal.scannPass==false && buscador==0){
                     llenarTabla();
                     llenarPuntos();
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item_punto, puntos);
                     punto.setAdapter(adapter);
-                    punto.setSelection(1);
+
+                }else if(buscador==1 && Principal.scannPass==true){
+                    Similar simi=new Similar();
+                    traerDatosProducto();
+                    llenarPuntos();
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item_punto, puntos);
+                    punto.setAdapter(adapter);
+                    punto.setSelection(obtenerPosicionItem(punto,String.valueOf(puntoBar)));
+                    Principal.scannPass=false;
+
+
+
                 }
 
             }
@@ -1310,7 +1390,8 @@ try {
 
         auxiliarDes=Double.parseDouble(descuento)/100;
         descuentoFinal = Double.parseDouble(variableS)*auxiliarDes;
-        Total=Double.parseDouble(variableS)- descuentoFinal;
+        BigDecimal bigDecimal=new BigDecimal(Double.parseDouble(variableS)- descuentoFinal).setScale(2, RoundingMode.UP);
+        Total=bigDecimal.doubleValue();
         precioTXT.setText("$"+variableS);
         descuentoTXT.setText("%"+descuento);
 
@@ -1338,8 +1419,8 @@ try {
 
 
 
-
-        db.execSQL("INSERT INTO  contenedor (estilo, imagen, talla, cantidad, marca, color, sub, total, barcode,acabado,corrida, cliente,ubicacion, descuento) VALUES('"+sp2.getText().toString()+"', '"+idImagen+"', '"+punto.getSelectedItem()+"', '"+cantidadTXT.getText().toString()+"','"+spMarca.getSelectedItem()+"','"+spColor.getSelectedItem()+"','"+variableS+"','"+pre+"','"+barcode+"','"+acabado+"','"+spCorrida.getSelectedItem()+"','"+clienteTXT.getText()+"','"+ubica+"', '"+descuento+"')");
+        String sql="INSERT INTO  contenedor (estilo, imagen, talla, cantidad, marca, color, sub, total, barcode,acabado,corrida, cliente,ubicacion, descuento) VALUES('"+sp2.getText().toString()+"', '"+idImagen+"', '"+punto.getSelectedItem()+"', '"+cantidadTXT.getText().toString()+"','"+spMarca.getSelectedItem()+"','"+color+"','"+variableS+"','"+pre+"','"+barcode+"','"+acabado+"','"+spCorrida.getSelectedItem()+"','"+clienteTXT.getText()+"','"+ubica+"', '"+descuento+"')";
+        db.execSQL(sql);
 
 
         pre=0;
@@ -1483,6 +1564,34 @@ try {
 
         }
 
+
+    }
+    public void contarSp4() {
+
+        listaMarca.clear();
+        listaMarca.add(" ");
+        idAcabado=getAcabado(spAcabado.getSelectedItem().toString());
+        try {
+            Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
+            String sql="select DISTINCT  m.marca, numero from marcas m inner join articulo a on m.numero = a.marca where a.estilo = '"+sp2.getText()+"' and a.Color = "+idColor+" and a.acabado = "+idAcabado+"";
+            ResultSet rs = st.executeQuery(sql);
+
+
+            while (rs.next()) {
+
+                marcaCantidad++;
+                String add=(rs.getString(1));
+                String s=(rs.getString(2));
+
+
+
+
+            }
+
+            // Toast.makeText(Principal.this,"Inicio de sesion Exitosa...!!!: " + empresa, Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "Error en sp4", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -1699,7 +1808,7 @@ try {
 
 
     public static void cargarDatos(String var){
-        scannPass=true;
+        Principal.scannPass=true;
         scu=0;
         BarCodeFIN="";
         estiloBar="";
@@ -1745,8 +1854,9 @@ try {
     }
 
     public static void cargarDatosBarcodeSimilar(String barcode){
-        scannPass=true;
-        puntoBar=Double.parseDouble(dl.getPunto());
+        Principal.scannPass=true;
+        Similar simi=new Similar();
+        puntoBar=Double.parseDouble(simi.getPunto());
         try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
             String sql="select ac.acabado, co.color, ma.MARCA ,cor.Nombre from articulo a inner join acabados ac  on a.ACABADO=ac.numero inner join colores co on a.COLOR=co.numero inner join marcas ma on a.MARCA=ma.NUMERO inner join corridas cor on a.corrida=cor.id where a.barcode='"+barcode+"';";
@@ -1797,14 +1907,15 @@ try {
             data = new ArrayList<Map<String, String>>();
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
             String puntoSp=punto.getSelectedItem().toString();
-            ResultSet rs = st.executeQuery("lupita'"+barcode+"',"+puntoSp+","+listado);
+            ResultSet rs = st.executeQuery("lupitaApartados'"+barcode+"',"+puntoSp+","+listado+",''");
             ResultSetMetaData rsmd=rs.getMetaData();
             while(rs.next()) {
 
 
-                existencias=(rs.getInt(2));
+                int apartado=consultarAPartados(barcode,puntoSp);
+                existencias=(rs.getInt(2)-real);
+                existencias=existencias-apartado;
                 existenciasTXT.setText(String.valueOf(existencias));
-
 
 
             }
@@ -1821,6 +1932,22 @@ try {
 
     }
 
+    public int  consultarAPartados(String barcode, String punto){
+
+        int apartado=0;
+        try {
+            Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
+            String sql="select SUM(cantidad) from apartados a inner join detap d on a.numero=d.numero where BARCODE='"+barcode+"' and d.punto="+punto+" and d.tienda="+ultimaVez();
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                apartado=rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+
+        }
+        return apartado;
+    }
 
     public void consultarCantidadReal(){
         int real=0;
@@ -1845,6 +1972,27 @@ try {
 
     }
 
+    public void contarPuntos(){
+
+        try {
+            puntos.clear();
+            puntos.add("");
+
+            double inicio, fin, medio;
+            inicio = Double.valueOf(in);
+            fin = Double.valueOf(finn);
+            medio = Double.valueOf(inc);
+
+            for (double i = inicio; i < fin + medio; i = i + medio) {
+
+                puntosCantidad++;
+
+            }
+
+        }catch (Exception e){
+
+        }
+    }
 
 
 
@@ -2141,7 +2289,7 @@ try {
 
     public void traerPrecio() {
         double Total;
-        scannPass=false;
+        Principal.scannPass=false;
         try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
             String sql="select precio,  DESCTO from precios where BARCODE="+"'"+barcode+"' and talla="+punto.getSelectedItem();
@@ -2172,7 +2320,8 @@ try {
         double Total;
         auxiliarDes=Double.parseDouble(descuento)/100;
         descuentoFinal = Double.parseDouble(variableS)*auxiliarDes;
-        Total=Double.parseDouble(variableS)- descuentoFinal;
+        BigDecimal bigDecimal=new BigDecimal(Double.parseDouble(variableS)- descuentoFinal).setScale(2,RoundingMode.UP);
+        Total=bigDecimal.floatValue();
         totalTXT.setText("$"+String.valueOf(Total));
 
     }
@@ -2189,6 +2338,12 @@ try {
     }
     public void llenarTabla(){
         String idCorrida=getIdCorrida();
+        where=" where ";
+        if(buscador==0){
+            where+=" a.estilo = '"+sp2.getText()+"' and a.Color ="+idColor+" and a.acabado ="+idAcabado+" and a.marca ="+idMarca+" and a.corrida="+idCorrida;
+        }else if(buscador==1){
+            where+=" a.estilo = '"+sp2.getText()+"' and a.marca ="+idMarca+" and a.corrida="+idCorrida;
+        }
 
         try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
@@ -2199,7 +2354,7 @@ try {
                     "  left join empleado e on a.comprador=e.numero inner join departamentos d on a.DEPARTAMENTO=d.NUMERO\n" +
                     "  inner join tacones ta on a.TACON=ta.NUMERO inner join plantillas pl on a.PLANTILLA=pl.NUMERO inner join forros f on a.FORRO=f.NUMERO \n" +
                     "  inner join corridas co on a.corrida=co.id inner join suelas su on a.SUELA=su.numero inner join colores c on a.color = c.numero\n" +
-                    "  inner join acabados ac on a.ACABADO=ac.NUMERO inner join marcas ma on a.MARCA=ma.NUMERO left join imagenes im on a.id=im.id inner join clasific clas on a.CLASIFIC=clas.numero where a.estilo = '"+sp2.getText()+"' and a.Color ="+idColor+" and a.acabado = "+idAcabado+" and a.marca = "+idMarca+" and a.corrida="+idCorrida;
+                    "  inner join acabados ac on a.ACABADO=ac.NUMERO inner join marcas ma on a.MARCA=ma.NUMERO left join imagenes im on a.id=im.id inner join clasific clas on a.CLASIFIC=clas.numero "+ where ;
             ResultSet rs = st.executeQuery(sql);
 
             while (rs.next()) {
@@ -2235,8 +2390,10 @@ try {
 
 
         } catch (Exception e) {
-            Toast.makeText(getActivity(), "Error en llenar Tabla", Toast.LENGTH_SHORT).show();
+            e.getMessage();
+            Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT).show();
         }
+
 
     }
 
@@ -2257,6 +2414,7 @@ try {
 
             // Toast.makeText(Principal.this,"Inicio de sesion Exitosa...!!!: " + empresa, Toast.LENGTH_LONG).show();
         } catch (Exception e) {
+            e.getMessage();
             Toast.makeText(getActivity(), "Error en llenar encabezado", Toast.LENGTH_SHORT).show();
         }
 
@@ -2482,7 +2640,33 @@ try {
         idPedido.setText("No. de pedido: " + idFecha);
     }
 
+    public void contarSp3() {
+        listaAcabado.clear();
+        listaAcabado.add("");
+        idColor=getColor(spColor.getSelectedItem().toString());
+        try {
+            Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
+            String sql="select DISTINCT ac.Acabado, numero from acabados ac inner join articulo a on ac.numero = a.acabado where a.estilo = '"+sp2.getText()+"' and a.Color = "+idColor+"";
+            ResultSet rs = st.executeQuery(sql);
 
+
+            while (rs.next()) {
+
+                acabadoCantidad++;
+
+                String add=(rs.getString(1));
+
+
+
+
+            }
+
+            // Toast.makeText(Principal.this,"Inicio de sesion Exitosa...!!!: " + empresa, Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "Error en sp3", Toast.LENGTH_SHORT).show();
+        }
+
+    }
 
     public void notification(String title, String message, Context context) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -3408,14 +3592,9 @@ public void insertarFma(String ticket, String pago){
         ConexionSQLiteHelper conn = new ConexionSQLiteHelper(getActivity(), "db tienda", null, 1);
         SQLiteDatabase db = conn.getReadableDatabase();
 
-
         Cursor cr = db.rawQuery("SELECT SUM(cantidad),SUM(total) FROM " + Utilidades.TABLA_CONTENEDOR , null);
         while (cr.moveToNext()) {
-
-
-
             rows.add(new String[] {" Pares: "+cr.getString(0) ," ","Total: $"+cr.getString(1)});
-
         }
         return rows;
     }

@@ -106,7 +106,8 @@ public class Resumen extends AppCompatActivity {
             mr.setPunto(cursor.getString(3));
             mr.setCantidad(cursor.getString(4));
             mr.setMarca(cursor.getString(5));
-            mr.setColor(cursor.getString(6));
+            String color=cursor.getString(6);
+            mr.setColor(color);
             mr.setSubtotal(cursor.getString(7));
             mr.setTotal(cursor.getString(8));
             mr.setBarcode(cursor.getString(9));
