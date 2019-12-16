@@ -43,8 +43,6 @@ public class menu extends AppCompatActivity
 
     String usuario, numeroUsuario, nombreUsuario;
     ModeloUsuario mu=new ModeloUsuario();
-    String empresa,listalista;
-    public static Boolean buscador=false;
 
     ConexionSQLiteHelper conn=new ConexionSQLiteHelper(this,"db tienda",null,1);
 
@@ -53,13 +51,7 @@ public class menu extends AppCompatActivity
     ConexionSqlServer conex=new ConexionSqlServer();
     ModeloEmpresa me=new ModeloEmpresa();
     ConexionBDCliente bdc=new ConexionBDCliente();
-    TextView idTienda;
-    ArrayList listaTiendas=new ArrayList();
 
-    String sucursal;
-
-    ModeloDatos md=new ModeloDatos();
-    FragmentManager fmp=getSupportFragmentManager();
 
 
 
@@ -81,10 +73,11 @@ public class menu extends AppCompatActivity
 
 
 
-        if(Principal.menu=true){
+       /* if(Principal.menu=true){
             fm.beginTransaction().replace(R.id.contenedorMenu, new Ventas()).commit();
             Principal.menu=false;
-        }
+        }*/
+
 
         View headerView = navigationView.getHeaderView(0);
         TextView navUsername = (TextView) headerView.findViewById(R.id.usu);
@@ -146,6 +139,11 @@ public class menu extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+  /*  static void estilo(View view){
+        FragmentManager fm=getSupportFragmentManager();
+        fm.beginTransaction().replace(R.id.contenedorMenu, new Ventas()).commit();
+    }
+    */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -153,21 +151,19 @@ public class menu extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            fm.beginTransaction().replace(R.id.contenedorMenu, new Ventas()).commit();
+          //  fm.beginTransaction().replace(R.id.contenedorMenu, new Ventas()).commit();
 
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
+                fm.beginTransaction().replace(R.id.contenedorMenu, new Ventas()).commit();
 
         } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
+            fm.beginTransaction().replace(R.id.contenedorMenu, new Consulta_Marcas()).commit();
+        } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_send) {
             getNameUser();
             insertarSalida();
             desactivado();
-            //cerramos secion en la app
+            //cerramos secion en la appcreo que sí
             Intent intent= new Intent(getApplicationContext(), Principal.class);
             //Cancelamos los hilos de notificaciones
 
@@ -207,6 +203,7 @@ public class menu extends AppCompatActivity
                     me.setEmpresa(rs.getString("empresa"));
 
                 }
+                st.close();
 
 
             } catch (Exception e) {
@@ -227,6 +224,7 @@ public class menu extends AppCompatActivity
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
             String sql="insert into logdia (nombre, fecha, tienda, hora,origen, tipo, idEmpleado, caja, id, llave, autoriza) values ('"+nombreUsuario+"', getDate(),"+mt.getNombreTienda()+",'"+FechaHora[1]+"', 1, 'SALIDA',"+numeroUsuario+",1 ,92911, newId(), 0 );";
             st.executeUpdate(sql);
+            st.close();
 
 
 
@@ -234,6 +232,8 @@ public class menu extends AppCompatActivity
             Toast.makeText(getApplicationContext(), "Error al checar salida", Toast.LENGTH_SHORT).show();
         }
     }
+
+
     public void ultimaVez(){
         ConexionSQLiteHelper conn = new ConexionSQLiteHelper(this, "db tienda", null, 1);
         SQLiteDatabase db = conn.getReadableDatabase();
@@ -257,11 +257,8 @@ public class menu extends AppCompatActivity
 
 
                 mt.setNumeroTienda(rs.getString(1));
-
-
-
             }
-
+            st.close();
 
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Error al obtener datos del usuario", Toast.LENGTH_SHORT).show();
@@ -278,13 +275,10 @@ public class menu extends AppCompatActivity
 
 
             while (rs.next()) {
-
-
                 nombreUsuario=rs.getString(1);
                 numeroUsuario=rs.getString(2);
-
-
             }
+            st.close();
 
 
         } catch (SQLException e) {
@@ -299,6 +293,7 @@ public class menu extends AppCompatActivity
             Statement st= conex.conexionBD().createStatement();
             String sql="update smAppAccesos set activo=0 where mail='"+mu.getCorreo()+"'";
             st.executeUpdate(sql);
+            st.close();
         }catch (Exception e ){
             e.getMessage();
             Toast.makeText(getApplicationContext(), "No sé puede Desactivar", Toast.LENGTH_SHORT).show();

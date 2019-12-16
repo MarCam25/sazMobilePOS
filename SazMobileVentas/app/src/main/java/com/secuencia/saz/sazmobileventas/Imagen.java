@@ -20,7 +20,6 @@ public class Imagen extends AppCompatActivity {
 
     ModeloEmpresa me=new ModeloEmpresa();
     ConexionBDCliente bdc=new ConexionBDCliente();
-    ConexionSqlServer conex=new ConexionSqlServer();
     ModeloImagen mi=new ModeloImagen();
     String idImagen;
     ImageView imagenView;
@@ -50,6 +49,7 @@ public class Imagen extends AppCompatActivity {
                 imagenView.setImageBitmap(bmap);
 
             }
+            st.close();
 
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Error al mostrar la imagen ", Toast.LENGTH_SHORT).show();

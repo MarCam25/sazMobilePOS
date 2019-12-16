@@ -3,16 +3,13 @@ package com.secuencia.saz.sazmobileventas;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-
 import android.support.v4.app.Fragment;
-
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -25,17 +22,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.secuencia.saz.sazmobileventas.Modelo.DatosLupita;
-
 import com.secuencia.saz.sazmobileventas.Modelo.ModeloEmpresa;
 import com.secuencia.saz.sazmobileventas.Modelo.ModeloNumeroOrden;
-
 import com.secuencia.saz.sazmobileventas.Modelo.ModeloUsuario;
 import com.secuencia.saz.sazmobileventas.Modelo.Pago;
 import com.secuencia.saz.sazmobileventas.Modelo.Similar;
@@ -47,26 +40,19 @@ import com.secuencia.saz.sazmobileventas.utilidades.ModeloTienda;
 import com.secuencia.saz.sazmobileventas.utilidades.TemplatePDF;
 import com.secuencia.saz.sazmobileventas.utilidades.Utilidades;
 
-
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.ResultSet;
-
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
 import java.util.Locale;
 
 
-
-
-
-public class Ventas extends Fragment {
+public class Consulta_Marcas extends Fragment {
 
     int cantidadRegistros;
 
@@ -112,6 +98,7 @@ public class Ventas extends Fragment {
     ArrayList listaSocio=new ArrayList();
     static String CodigoBar="";
     ArrayList listaMarca=new ArrayList();
+
     ArrayList listaCorrida=new ArrayList();
     static ArrayList puntos=new ArrayList();
     String numeroUsuario;
@@ -124,7 +111,7 @@ public class Ventas extends Fragment {
 
     String dispositivo;
 
-    static int colorCantidad=0, acabadoCantidad=0, marcaCantidad=0, corridaCantidad=0,puntosCantidad=0;
+    static int colorCantidad=0, acabadoCantidad=0, marcaCantidad=0, corridaCantidad=0,puntosCantidad=0,estiloCantidad=0;
 
     TextView precioTXT;
 
@@ -142,7 +129,7 @@ public class Ventas extends Fragment {
 
     public static TextView existenciasTXT, cantidadTXT, unidadesTXT, importeTXT,descuentoTXT,totalTXT;
 
-    public static EditText sp2;
+    public static Spinner sp2;
     static TextView clienteTXT;
 
     double r;
@@ -189,6 +176,7 @@ public class Ventas extends Fragment {
     double subtotalTicket;
 
 
+
     private String sucursal="Sucursal: "+ mt.getNumeroTienda();
 
 
@@ -201,6 +189,8 @@ public class Ventas extends Fragment {
     TextView txtSaldoRestante;
 
 
+    ArrayList listaEstilo=null;
+
 
 
 
@@ -208,7 +198,8 @@ public class Ventas extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        root=inflater.inflate(R.layout.fragment_ventas, container, false);
+        root=inflater.inflate(R.layout.fragment_consulta__marcas, container, false);
+
         context=root.getContext();
 
 
@@ -220,7 +211,7 @@ public class Ventas extends Fragment {
 
         getUser();
 
-        sp2=(EditText)root.findViewById(R.id.sp2);
+        sp2=(Spinner)root.findViewById(R.id.sp2);
         btnDetalle=(Button)root.findViewById(R.id.btnDetalle);
 
 
@@ -261,9 +252,17 @@ public class Ventas extends Fragment {
         forma.setVisibility(View.INVISIBLE);
         modoBusqueda.start();
 
+        inicializarMarca();
+
+
+
+
         if(Integer.parseInt(unidadesTXT.getText().toString())>0){
             efectivoTxt.setEnabled(true);
         }
+
+
+
 
         btnOtras.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -331,18 +330,18 @@ public class Ventas extends Fragment {
 
                 try {
 
-                        if (existencias > 0) {
-                            existencias--;
-                            existenciasTXT.setText(String.valueOf(existencias));
-                            cantidad++;
-                            String res = String.valueOf(cantidad);
-                            cantidadTXT.setText(res);
+                    if (existencias > 0) {
+                        existencias--;
+                        existenciasTXT.setText(String.valueOf(existencias));
+                        cantidad++;
+                        String res = String.valueOf(cantidad);
+                        cantidadTXT.setText(res);
 
-                        } else {
-                            Toast.makeText(getActivity(), "No hay existencias disponible de este producto", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getActivity(), "No hay existencias disponible de este producto", Toast.LENGTH_LONG).show();
 
 
-                        }
+                    }
 
 
                 }catch(Exception e){
@@ -377,295 +376,297 @@ public class Ventas extends Fragment {
                 monto.setVisibility(View.VISIBLE);
                 forma.setVisibility(View.VISIBLE);
 
-                  try {
-                          if(!efectivoTxt.getText().toString().isEmpty()) {
-                          String ticket = generarTicket();
+                try {
+                    if(!efectivoTxt.getText().toString().isEmpty()) {
+                        String ticket = generarTicket();
 
 
 
 
-                          Double precio = Double.parseDouble(importeTXT.getText().toString());
-                          Double pagos = Double.parseDouble(efectivoTxt.getText().toString());
+                        Double precio = Double.parseDouble(importeTXT.getText().toString());
+                        Double pagos = Double.parseDouble(efectivoTxt.getText().toString());
 
 
-                          if(restar==false) {
-                              resultado = precio - pagos;
-                          }else if(restar==true){
-                              resultado=resultado-pagos;
-                          }
+                        if(restar==false) {
+                            resultado = precio - pagos;
+                        }else if(restar==true){
+                            resultado=resultado-pagos;
+                        }
 
-                          if (resultado == 0) {
-                              registroPagos();
-                              if(metodoPago!=null){
-                                  if (metodoPago.equals(spBanco.getSelectedItem().toString()))
-                                  {
-                                      recyclerView = (RecyclerView) root.findViewById(R.id.recy);
-                                      ultimaVez();
-                                      updatePago();
-                                      recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                                      mostrarPago();
-                                      AdaptadorPago adapter = new AdaptadorPago(listaPago);
-                                      recyclerView.setAdapter(adapter);
+                        if (resultado == 0) {
+                            registroPagos();
+                            if(metodoPago!=null){
+                                if (metodoPago.equals(spBanco.getSelectedItem().toString()))
+                                {
+                                    recyclerView = (RecyclerView) root.findViewById(R.id.recy);
+                                    ultimaVez();
+                                    updatePago();
+                                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                                    mostrarPago();
+                                    AdaptadorPago adapter = new AdaptadorPago(listaPago);
+                                    recyclerView.setAdapter(adapter);
 
-                                  }else{
-                                      recyclerView = (RecyclerView) root.findViewById(R.id.recy);
-                                      ultimaVez();
-                                     insertarPago();
-                                      recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                                      mostrarPago();
-                                      AdaptadorPago adapter = new AdaptadorPago(listaPago);
-                                      recyclerView.setAdapter(adapter);
-                                  }
-                              }else{
-                                  recyclerView = (RecyclerView) root.findViewById(R.id.recy);
-                                  ultimaVez();
-                                  insertarPago();
-                                  recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                                  mostrarPago();
-                                  AdaptadorPago adapter = new AdaptadorPago(listaPago);
-                                  recyclerView.setAdapter(adapter);
-                              }
+                                }else{
+                                    recyclerView = (RecyclerView) root.findViewById(R.id.recy);
+                                    ultimaVez();
+                                    insertarPago();
+                                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                                    mostrarPago();
+                                    AdaptadorPago adapter = new AdaptadorPago(listaPago);
+                                    recyclerView.setAdapter(adapter);
+                                }
+                            }else{
+                                recyclerView = (RecyclerView) root.findViewById(R.id.recy);
+                                ultimaVez();
+                                insertarPago();
+                                recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                                mostrarPago();
+                                AdaptadorPago adapter = new AdaptadorPago(listaPago);
+                                recyclerView.setAdapter(adapter);
+                            }
 
-                              validarPago(ticket);
+                            validarPago(ticket);
 
-                              listaPago = new ArrayList<>();
-                              recyclerView = (RecyclerView) root.findViewById(R.id.recy);
-                              ultimaVez();
-                              recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                              mostrarPago();
-                              AdaptadorPago adapter = new AdaptadorPago(listaPago);
-                              recyclerView.setAdapter(adapter);
-                              limpiarCajas();
-                              listaCorrida.clear();
-                              listaMarca.clear();
-                              listaAcabado.clear();
-                              lista.clear();
-
-                              sp2.setText(null);
-                              restar=false;
-                              efectivoTxt.setText(null);
-
-
-                              btnPagar.setEnabled(false);
-
-                              unidadesTXT.setText("0");
-                              importeTXT.setText("0");
-                              existenciasTXT.setText(null);
-                              existencias=0;
-                              pagado=true;
-
-                          } else if (resultado < 0) {
-                              cambio = resultado * -1;
-                              registroPagos();
-                              if(metodoPago!=null){
-                                  if (metodoPago.equals(spBanco.getSelectedItem().toString()))
-                                  {
-                                      recyclerView = (RecyclerView) root.findViewById(R.id.recy);
-                                      ultimaVez();
-                                      updatePago();
-                                      recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                                      mostrarPago();
-                                      AdaptadorPago adapter = new AdaptadorPago(listaPago);
-                                      recyclerView.setAdapter(adapter);
-
-                                  }else{
-                                      recyclerView = (RecyclerView) root.findViewById(R.id.recy);
-                                      ultimaVez();
-                                      insertarPago();
-                                      recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                                      mostrarPago();
-                                      AdaptadorPago adapter = new AdaptadorPago(listaPago);
-                                      recyclerView.setAdapter(adapter);
-                                  }
-                              }else{
-                                  recyclerView = (RecyclerView) root.findViewById(R.id.recy);
-                                  ultimaVez();
-                                  insertarPago();
-                                  recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                                  mostrarPago();
-                                  AdaptadorPago adapter = new AdaptadorPago(listaPago);
-                                  recyclerView.setAdapter(adapter);
-                              }
-                              validarPago(ticket);
-
-                              listaPago = new ArrayList<>();
-                              recyclerView = (RecyclerView) root.findViewById(R.id.recy);
-                              ultimaVez();
-                              recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                              mostrarPago();
-                              AdaptadorPago adapter = new AdaptadorPago(listaPago);
-                              recyclerView.setAdapter(adapter);
-                              limpiarCajas();
-                              listaCorrida.clear();
-                              listaMarca.clear();
-                              listaAcabado.clear();
-                              lista.clear();
-
-                              sp2.setText(null);
-                              restar=false;
-                              efectivoTxt.setText(null);
-                              btnPagar.setEnabled(false);
-
-                              existencias=0;
-                              pagado=true;
-                              Toast.makeText(getActivity(),"Compra finalizada, Presiona el boton ticket para generarlo",Toast.LENGTH_LONG).show();
-                          } else if (resultado > 0) {
-                              registroPagos();
-                              if(metodoPago!=null){
-                                  if (metodoPago.equals(spBanco.getSelectedItem().toString()))
-                                  {
-                                      recyclerView = (RecyclerView) root.findViewById(R.id.recy);
-                                      ultimaVez();
-                                      updatePago();
-                                      recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                                      mostrarPago();
-                                      AdaptadorPago adapter = new AdaptadorPago(listaPago);
-                                      recyclerView.setAdapter(adapter);
-
-                                  }else{
-                                      recyclerView = (RecyclerView) root.findViewById(R.id.recy);
-                                      ultimaVez();
-                                      insertarPago();
-                                      recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                                      mostrarPago();
-                                      AdaptadorPago adapter = new AdaptadorPago(listaPago);
-                                      recyclerView.setAdapter(adapter);
-                                  }
-                              }else{
-                                  recyclerView = (RecyclerView) root.findViewById(R.id.recy);
-                                  ultimaVez();
-                                  insertarPago();
-                                  recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                                  mostrarPago();
-                                  AdaptadorPago adapter = new AdaptadorPago(listaPago);
-                                  recyclerView.setAdapter(adapter);
-                              }
-                              listaPago = new ArrayList<>();
-                              recyclerView = (RecyclerView) root.findViewById(R.id.recy);
-                              ultimaVez();
-                              recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                              mostrarPago();
-                              AdaptadorPago adapter = new AdaptadorPago(listaPago);
-                              recyclerView.setAdapter(adapter);
-                              efectivoTxt.setText(null);
-                              restar=true;
-                              pagado=false;
-                              txtSaldoRestante.setText("Monto pendiente: "+resultado );
-
-
-                          }
-
-
-                      }else{
-                          Toast.makeText(getActivity(),"Debes agregar un monto a pagar ",Toast.LENGTH_LONG).show();
-                      }
-
-
-                      if(pagado==true){
-
-                              iva();
-
-                          obtenerDatosTienda();
-                          razonSocial();
-                          pdf= new TemplatePDF(getActivity());
-                          pdf.openDocument();
-                          pdf.addImgName();
-                          pdf.addMetaData("Productos","ventas","  PRUEBA");
-                          pdf.addTitles("SazMobile Pos","Nota de venta", fechaTicket);
-                          pdf.addParagraph(razon);
-                          pdf.addParagraph("RFC: "+ rfc);
-                          pdf.addParagraph(sucursal);
-                          pdf.addParagraph("Lugar de expedición: "+obtenerColonia());
-                          pdf.addParagraph(calle);
-                          pdf.addParagraph("teléfono: "+tel);
-                          pdf.addParagraph(estado);
-                          pdf.addParagraph("Código postal: "+cp);
-                          pdf.addParagraph("Vendedor: "+mu.getNombre());
-                          if(spSocio.getSelectedItem().toString()!=null){
-                              pdf.addParagraph("Vendido a"+spSocio.getSelectedItem().toString());
-                          }else{
-                              pdf.addParagraph("(-1) Ventas mostrador");
-                          }
-
-                          pdf.addParagraph("No. Ticket: "+generarTicket());
-                          pdf.tablaProductos(header,getProductos());
-                          pdf.tablaTotal(headerTotal,getSubTotal());
-                          if(iva==1) {
-                              pdf.tablaTotal(headerTotal, getIva());
-                          }
-                          pdf.tablaTotal(headerTotal,getTotal());
-                          pdf.tablaPagos(headerPagos,getPagos());
-                          pdf.addParagraph("* Gracias por su compra *");
-
-                          pdf.closeDocument();
-
-
-                          Principal.menu=true;
-                          btnPagar.setEnabled(false);
+                            listaPago = new ArrayList<>();
+                            recyclerView = (RecyclerView) root.findViewById(R.id.recy);
+                            ultimaVez();
+                            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                            mostrarPago();
+                            AdaptadorPago adapter = new AdaptadorPago(listaPago);
+                            recyclerView.setAdapter(adapter);
+                            limpiarCajas();
+                            listaCorrida.clear();
+                            listaMarca.clear();
+                            listaAcabado.clear();
+                            lista.clear();
 
 
 
-                          deleteContenedor();
-                          delete();
+                            restar=false;
+                            efectivoTxt.setText(null);
 
 
-                          limpiarCajas();
-                          sp2.setText(null);
-                          lista.clear();
-                          spColor.setAdapter(null);
+                            btnPagar.setEnabled(false);
 
-                          listaAcabado.clear();
-                          spAcabado.setAdapter(null);
+                            unidadesTXT.setText("0");
+                            importeTXT.setText("0");
+                            existenciasTXT.setText(null);
+                            existencias=0;
+                            pagado=true;
 
-                          listaMarca.clear();
-                          spMarca.setAdapter(null);
+                        } else if (resultado < 0) {
+                            cambio = resultado * -1;
+                            registroPagos();
+                            if(metodoPago!=null){
+                                if (metodoPago.equals(spBanco.getSelectedItem().toString()))
+                                {
+                                    recyclerView = (RecyclerView) root.findViewById(R.id.recy);
+                                    ultimaVez();
+                                    updatePago();
+                                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                                    mostrarPago();
+                                    AdaptadorPago adapter = new AdaptadorPago(listaPago);
+                                    recyclerView.setAdapter(adapter);
 
-                          listaCorrida.clear();
-                          spCorrida.setAdapter(null);
+                                }else{
+                                    recyclerView = (RecyclerView) root.findViewById(R.id.recy);
+                                    ultimaVez();
+                                    insertarPago();
+                                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                                    mostrarPago();
+                                    AdaptadorPago adapter = new AdaptadorPago(listaPago);
+                                    recyclerView.setAdapter(adapter);
+                                }
+                            }else{
+                                recyclerView = (RecyclerView) root.findViewById(R.id.recy);
+                                ultimaVez();
+                                insertarPago();
+                                recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                                mostrarPago();
+                                AdaptadorPago adapter = new AdaptadorPago(listaPago);
+                                recyclerView.setAdapter(adapter);
+                            }
+                            validarPago(ticket);
 
-                          limpiarCajas();
+                            listaPago = new ArrayList<>();
+                            recyclerView = (RecyclerView) root.findViewById(R.id.recy);
+                            ultimaVez();
+                            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                            mostrarPago();
+                            AdaptadorPago adapter = new AdaptadorPago(listaPago);
+                            recyclerView.setAdapter(adapter);
+                            limpiarCajas();
+                            listaCorrida.clear();
+                            listaMarca.clear();
+                            listaAcabado.clear();
+                            lista.clear();
 
-                          puntos.clear();
-                          punto.setAdapter(null);
 
-                          cantidadTXT.setText(null);
-                          precioTXT.setText(null);
 
-                          clienteTXT.setText(null);
-                          unidadesTXT.setText("0");
-                          importeTXT.setText("0");
-                          precioTXT.setText(null);
-                          descuentoTXT.setText(null);
-                          totalTXT.setText(null);
+                            restar=false;
+                            efectivoTxt.setText(null);
+                            btnPagar.setEnabled(false);
 
-                          listaSocio.clear();
-                          listaSocio.add(null);
-                          spSocio.setAdapter(null);
+                            existencias=0;
+                            pagado=true;
+                            Toast.makeText(getActivity(),"Compra finalizada, Presiona el boton ticket para generarlo",Toast.LENGTH_LONG).show();
+                        } else if (resultado > 0) {
+                            registroPagos();
+                            if(metodoPago!=null){
+                                if (metodoPago.equals(spBanco.getSelectedItem().toString()))
+                                {
+                                    recyclerView = (RecyclerView) root.findViewById(R.id.recy);
+                                    ultimaVez();
+                                    updatePago();
+                                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                                    mostrarPago();
+                                    AdaptadorPago adapter = new AdaptadorPago(listaPago);
+                                    recyclerView.setAdapter(adapter);
 
-                          listaBancos.add(null);
-                          listaBancos.add("");
-                          listaBancos.clear();
+                                }else{
+                                    recyclerView = (RecyclerView) root.findViewById(R.id.recy);
+                                    ultimaVez();
+                                    insertarPago();
+                                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                                    mostrarPago();
+                                    AdaptadorPago adapter = new AdaptadorPago(listaPago);
+                                    recyclerView.setAdapter(adapter);
+                                }
+                            }else{
+                                recyclerView = (RecyclerView) root.findViewById(R.id.recy);
+                                ultimaVez();
+                                insertarPago();
+                                recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                                mostrarPago();
+                                AdaptadorPago adapter = new AdaptadorPago(listaPago);
+                                recyclerView.setAdapter(adapter);
+                            }
+                            listaPago = new ArrayList<>();
+                            recyclerView = (RecyclerView) root.findViewById(R.id.recy);
+                            ultimaVez();
+                            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                            mostrarPago();
+                            AdaptadorPago adapter = new AdaptadorPago(listaPago);
+                            recyclerView.setAdapter(adapter);
+                            efectivoTxt.setText(null);
+                            restar=true;
+                            pagado=false;
+                            txtSaldoRestante.setText("Monto pendiente: "+resultado );
 
-                          spBanco.setAdapter(null);
 
-                          up = 0;
-                          pre = 0.0;
-                          intentResummen = null;
-                          tot = 0;
-                          idFecha = null;
-                          monto.setVisibility(View.INVISIBLE);
-                          forma.setVisibility(View.INVISIBLE);
+                        }
 
-                          pdf.viewPDF();
-                          dropDatos();
-                      }else{
-                          Toast.makeText(getActivity(),"No se puede generar el ticket hasta que la venta no se complete.", Toast.LENGTH_LONG).show();
-                      }
 
-                  }catch(Exception e){
-                      e.getMessage();
-                      Toast.makeText(getActivity()," No es posible realizar el pago. ",Toast.LENGTH_LONG).show();
-                  }
+                    }else{
+                        Toast.makeText(getActivity(),"Debes agregar un monto a pagar ",Toast.LENGTH_LONG).show();
+                    }
+
+
+                    if(pagado==true){
+
+                        iva();
+
+                        obtenerDatosTienda();
+                        razonSocial();
+                        pdf= new TemplatePDF(getActivity());
+                        pdf.openDocument();
+                        pdf.addImgName();
+                        pdf.addMetaData("Productos","ventas","  PRUEBA");
+                        pdf.addTitles("SazMobile Pos","Nota de venta", fechaTicket);
+                        pdf.addParagraph(razon);
+                        pdf.addParagraph("RFC: "+ rfc);
+                        pdf.addParagraph(sucursal);
+                        pdf.addParagraph("Lugar de expedición: "+obtenerColonia());
+                        pdf.addParagraph(calle);
+                        pdf.addParagraph("teléfono: "+tel);
+                        pdf.addParagraph(estado);
+                        pdf.addParagraph("Código postal: "+cp);
+                        pdf.addParagraph("Vendedor: "+mu.getNombre());
+                        if(spSocio.getSelectedItem().toString()!=null){
+                            pdf.addParagraph("Vendido a"+spSocio.getSelectedItem().toString());
+                        }else{
+                            pdf.addParagraph("(-1) Ventas mostrador");
+                        }
+
+                        pdf.addParagraph("No. Ticket: "+generarTicket());
+                        pdf.tablaProductos(header,getProductos());
+                        pdf.tablaTotal(headerTotal,getSubTotal());
+                        if(iva==1) {
+                            pdf.tablaTotal(headerTotal, getIva());
+                        }
+                        pdf.tablaTotal(headerTotal,getTotal());
+                        pdf.tablaPagos(headerPagos,getPagos());
+                        pdf.addParagraph("* Gracias por su compra *");
+
+                        pdf.closeDocument();
+
+
+                        Principal.menu=true;
+                        btnPagar.setEnabled(false);
+
+
+
+                        deleteContenedor();
+                        delete();
+
+
+                        limpiarCajas();
+
+                        lista.clear();
+                        spColor.setAdapter(null);
+
+                        listaAcabado.clear();
+                        spAcabado.setAdapter(null);
+
+                        listaMarca.clear();
+                        spMarca.setAdapter(null);
+
+                        listaCorrida.clear();
+                        spCorrida.setAdapter(null);
+
+                        limpiarCajas();
+
+                        puntos.clear();
+                        punto.setAdapter(null);
+
+                        cantidadTXT.setText(null);
+                        precioTXT.setText(null);
+
+                        clienteTXT.setText(null);
+                        unidadesTXT.setText("0");
+                        importeTXT.setText("0");
+                        precioTXT.setText(null);
+                        descuentoTXT.setText(null);
+                        totalTXT.setText(null);
+
+                        listaSocio.clear();
+                        listaSocio.add(null);
+                        spSocio.setAdapter(null);
+
+                        listaBancos.add(null);
+                        listaBancos.add("");
+                        listaBancos.clear();
+
+                        spBanco.setAdapter(null);
+
+                        up = 0;
+                        pre = 0.0;
+                        intentResummen = null;
+                        tot = 0;
+                        idFecha = null;
+                        monto.setVisibility(View.INVISIBLE);
+                        forma.setVisibility(View.INVISIBLE);
+
+                        pdf.viewPDF();
+                        dropDatos();
+                    }else{
+                        Toast.makeText(getActivity(),"No se puede generar el ticket hasta que la venta no se complete.", Toast.LENGTH_LONG).show();
+                    }
+
+                }catch(Exception e){
+                    e.getMessage();
+                    Toast.makeText(getActivity()," No es posible realizar el pago. ",Toast.LENGTH_LONG).show();
+                }
 
 
 
@@ -711,13 +712,11 @@ public class Ventas extends Fragment {
         ConsultarNuevosRegistros();
 
 
-
         btnBardoce.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 xcaner=true;
                 startActivity(new Intent(getActivity(),Scann.class));
-
 
             }
         });
@@ -727,35 +726,35 @@ public class Ventas extends Fragment {
 
 
 
-try {
+                try {
 
-    int cantiTxt = Integer.parseInt(cantidadTXT.getText().toString());
+                    int cantiTxt = Integer.parseInt(cantidadTXT.getText().toString());
 
+                    if (cantiTxt > 0) {
+                        efectivoTxt.setEnabled(true);
 
-    if (cantiTxt > 0) {
-        efectivoTxt.setEnabled(true);
-
-
-        generarImporte();
-        generarCantidad();
-        obtenerRegistrosSQLite();
-        Finalizare();
-
-        cantidadTXT.setText("0");
-        descontarExistencias();
+                        generarImporte();
+                        generarCantidad();
+                        obtenerRegistrosSQLite();
+                        Finalizare();
 
 
-    } else {
-        Toast.makeText(getActivity(), "No hay Producto", Toast.LENGTH_SHORT).show();
-    }
+                        cantidadTXT.setText("0");
+                        descontarExistencias();
 
-}catch (Exception e){
-    Toast.makeText(getActivity(), "No hay Producto", Toast.LENGTH_SHORT).show();
-}
+
+                    } else {
+                        Toast.makeText(getActivity(), "No hay Producto", Toast.LENGTH_SHORT).show();
+                    }
+
+                }catch (Exception e){
+                    e.getMessage();
+                    Toast.makeText(getActivity(), "Error 742", Toast.LENGTH_SHORT).show();
+
+                }
 
             }
         });
-
 
 
         btnDetalle.setOnClickListener(new View.OnClickListener() {
@@ -763,14 +762,15 @@ try {
             public void onClick(View v) {
                 try {
 
-                   Toast toast =new  Toast(getActivity());
+                    Toast toast =new  Toast(getActivity());
                     pl.droidsonroids.gif.GifImageView view=new  pl.droidsonroids.gif.GifImageView(getActivity());
                     view.setImageResource(R.drawable.loading);
                     toast.setView(view);
                     toast.show();
+                    Principal.estilo=sp2.getSelectedItem().toString();
                     Intent detalle = new Intent(getActivity(), Detalle.class);
 
-                    detalle.putExtra("valores", sp2.getText() + "-" + Principal.idColor + "-" + Principal.idAcabado + "-" + idMarca + "-" + empress);
+                    detalle.putExtra("valores", sp2.getSelectedItemId() + "-" + Principal.idColor + "-" + Principal.idAcabado + "-" + idMarca + "-" + empress);
 
                     startActivity(detalle);
 
@@ -808,7 +808,7 @@ try {
         });
 
 
-
+/*
         sp2.addTextChangedListener(new TextWatcher()
         {
             @Override
@@ -819,8 +819,7 @@ try {
                 listaAcabado.clear();
                 spAcabado.setAdapter(null);
 
-                listaMarca.clear();
-                spMarca.setAdapter(null);
+
 
                 listaCorrida.clear();
                 spCorrida.setAdapter(null);
@@ -847,7 +846,7 @@ try {
             public void afterTextChanged(Editable s) {
 
             }
-        });
+        });*/
 
 
 
@@ -866,106 +865,101 @@ try {
 
 
 
-        sp2.setOnKeyListener(new View.OnKeyListener() {
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
 
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    try {
 
-                    }catch (IllegalThreadStateException e){
-                        e.getMessage();
-                    }
+        sp2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                    buscador=0;
 
-                    colorCantidad=0;
-                    acabadoCantidad=0;
-                    marcaCantidad=0;
-                    colorCantidad=0;
-                    puntosCantidad=0;
+                buscador=0;
+                colorCantidad=0;
+                acabadoCantidad=0;
+                colorCantidad=0;
+                puntosCantidad=0;
 
 
 
-                    listaCorrida.clear();
-                    listaMarca.clear();
-                    listaAcabado.clear();
-                    lista.clear();
-
-                    limpiarCajas();
+                listaCorrida.clear();
 
 
-
-                    Toast.makeText(getActivity(), "Cargando...", Toast.LENGTH_LONG).show();
-
-                    puntos.clear();
+                listaAcabado.clear();
+                lista.clear();
 
 
-                    punto.setAdapter(null);
-
-                    contarSp();
-                    if(colorCantidad>0) {
-                        if (Principal.scannPass == true && buscador == 0) {
-                            llenarSp();
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, lista);
-                            spColor.setAdapter(adapter);
-                            spColor.setSelection(obtenerPosicionItem(spColor, colorBar));
-                        } else if (Principal.scannPass == false && colorCantidad == 1 && buscador == 0) {
-                            llenarSp();
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, lista);
-                            spColor.setAdapter(adapter);
-                            spColor.setSelection(1);
-
-
-                        } else if (Principal.scannPass == false && colorCantidad > 1 && buscador == 0) {
-                            llenarSp();
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, lista);
-                            spColor.setAdapter(adapter);
-
-                        } else if (buscador == 1 && Principal.scannPass==false) {
-                            buscarMarcas();
-
-                            if (marcaCantidad == 1) {
-
-
-                                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaMarca);
-                                spMarca.setAdapter(adapter);
-                                spMarca.setSelection(1);
+                limpiarCajas();
 
 
 
-                            } else if (marcaCantidad > 1) {
+                Toast.makeText(getActivity(), "Cargando...", Toast.LENGTH_LONG).show();
 
-                                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaMarca);
-                                spMarca.setAdapter(adapter);
+                puntos.clear();
 
 
-                            }
+                punto.setAdapter(null);
+                idMarca=getMarca(spMarca.getSelectedItem().toString());
+                contarSp();
+                if(colorCantidad>0) {
+                    if (Principal.scannPass == true && buscador == 0) {
+                        llenarSp();
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, lista);
+                        spColor.setAdapter(adapter);
+                        spColor.setSelection(obtenerPosicionItem(spColor, colorBar));
+                    } else if (Principal.scannPass == false && colorCantidad == 1 && buscador == 0) {
+                        llenarSp();
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, lista);
+                        spColor.setAdapter(adapter);
+                        spColor.setSelection(1);
 
-                        } else if (Principal.scannPass == false && buscador == 0) {
-                            llenarSp();
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, lista);
-                            spColor.setAdapter(adapter);
 
-                        }else if(buscador == 1 && Principal.scannPass==true){
-                            buscarMarcas();
+                    } else if (Principal.scannPass == false && colorCantidad > 1 && buscador == 0) {
+                        llenarSp();
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, lista);
+                        spColor.setAdapter(adapter);
+
+                    } else if (buscador == 1 && Principal.scannPass==false) {
+                        buscarMarcas();
+
+                        if (marcaCantidad == 1) {
+
+
                             ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaMarca);
                             spMarca.setAdapter(adapter);
-                            spMarca.setSelection(obtenerPosicionItem(spMarca, marcaBar));
+                            spMarca.setSelection(1);
+
+
+
+                        } else if (marcaCantidad > 1) {
+
+                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaMarca);
+                            spMarca.setAdapter(adapter);
+
 
                         }
-                    }else{
-                        Toast.makeText(getActivity(),"Estilo no valido",Toast.LENGTH_LONG).show();
+
+                    } else if (Principal.scannPass == false && buscador == 0) {
+                        llenarSp();
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, lista);
+                        spColor.setAdapter(adapter);
+
+                    }else if(buscador == 1 && Principal.scannPass==true){
+                        buscarMarcas();
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaMarca);
+                        spMarca.setAdapter(adapter);
+                        spMarca.setSelection(obtenerPosicionItem(spMarca, marcaBar));
+
                     }
-
-
-                    return true;
+                }else{
+                    Toast.makeText(getActivity(),"Estilo no valido",Toast.LENGTH_LONG).show();
                 }
-                return false;
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
-
-
 
 
         spColor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -976,11 +970,11 @@ try {
                 x.setTextColor(Color.YELLOW); toast.show();
 
                 listaAcabado.clear();
-                listaMarca.clear();
+
                 listaCorrida.clear();
                 puntos.clear();
                 spAcabado.setAdapter(null);
-                spMarca.setAdapter(null);
+
                 spCorrida.setAdapter(null);
                 punto.setAdapter(null);
                 precioTXT.setText(null);
@@ -989,7 +983,7 @@ try {
 
                 colorCantidad=0;
                 acabadoCantidad=0;
-                marcaCantidad=0;
+
                 colorCantidad=0;
                 puntosCantidad=0;
 
@@ -1038,84 +1032,30 @@ try {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                listaMarca.clear();
-                listaCorrida.clear();
-                puntos.clear();
-
-
-                limpiarCajas();
-
-                spMarca.setAdapter(null);
-                spCorrida.setAdapter(null);
-                punto.setAdapter(null);
-
-                colorCantidad=0;
-                acabadoCantidad=0;
-                marcaCantidad=0;
-                colorCantidad=0;
-                puntosCantidad=0;
-                contarSp4();
-                if(Principal.scannPass==true){
-                    llenarSp4();
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaMarca);
-                    spMarca.setAdapter(adapter);
-                    spMarca.setSelection(obtenerPosicionItem(spMarca,marcaBar));
-                }else if(Principal.scannPass==false && marcaCantidad==1){
-                    llenarSp4();
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaMarca);
-                    spMarca.setAdapter(adapter);
-                    spMarca.setSelection(1);
-
-
-                }else if(Principal.scannPass==false && marcaCantidad>1){
-                    llenarSp4();
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaMarca);
-                    spMarca.setAdapter(adapter);
-
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-
-        spMarca.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
                 try {
 
-                    String validador="";
-                    validador=spMarca.getSelectedItem().toString();
-                    if(validador.equals(" ")) {
-                        listaCorrida.clear();
-                        Principal.idCorrida="";
-                        spCorrida.setAdapter(null);
+                    String validador = "";
+                    validador = spMarca.getSelectedItem().toString();
+                    if (validador.equals(" ")) {
+
                         puntos.clear();
                         punto.setAdapter(null);
+                        listaCorrida.clear();
+                        spCorrida.setAdapter(null);
 
 
+                    } else {
 
-                    }else{
 
                         spCorrida.setAdapter(null);
                         punto.setAdapter(null);
                         listaCorrida.clear();
                         puntos.clear();
                         limpiarCajas();
-
+                        ReinicarContadores();
                         spCorrida.setAdapter(null);
                         listaCorrida.clear();
 
-
-                        colorCantidad=0;
-                        acabadoCantidad=0;
-                        marcaCantidad=0;
-                        colorCantidad=0;
-                        puntosCantidad=0;
 
                         contarSp5();
                         if (Principal.scannPass == true && buscador == 0) {
@@ -1134,14 +1074,14 @@ try {
                             ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaCorrida);
                             spCorrida.setAdapter(adapter);
 
-                        } else if (buscador == 1 && Principal.scannPass==false) {
+                        } else if (buscador == 1 && Principal.scannPass == false) {
                             llenarSp5();
                             obtenerCorrida();
-                            if(corridaCantidad==1){
+                            if (corridaCantidad == 1) {
                                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaCorrida);
                                 spCorrida.setAdapter(adapter);
                                 spCorrida.setSelection(1);
-                            }else if(corridaCantidad>1){
+                            } else if (corridaCantidad > 1) {
                                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaCorrida);
                                 spCorrida.setAdapter(adapter);
                             }
@@ -1151,7 +1091,7 @@ try {
                             ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaCorrida);
                             spCorrida.setAdapter(adapter);
 
-                        }else if (buscador == 1 && Principal.scannPass==true) {
+                        } else if (buscador == 1 && Principal.scannPass == true) {
                             llenarSp5();
                             obtenerCorrida();
 
@@ -1160,9 +1100,7 @@ try {
                             spCorrida.setSelection(obtenerPosicionItem(spCorrida, corridaBar));
 
 
-
                         }
-
                     }
                 }catch(Exception e){
 
@@ -1170,12 +1108,42 @@ try {
 
             }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        spMarca.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                try{
+
+
+                    contarEstilos();
+                    if(estiloCantidad!=0) {
+
+                        sp2.setAdapter(null);
+                        llenarEstilos();
+
+                    }
+
+
+                }catch (IndexOutOfBoundsException e){
+                    e.getMessage();
+                }
+
+            }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
             }
         });
+
+
 
 
         spCorrida.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -1206,9 +1174,9 @@ try {
                     marcaCantidad = 0;
                     colorCantidad = 0;
                     puntosCantidad = 0;
-
-
+                    llenarTabla();
                     contarPuntos();
+                    traerDatosProducto();
                     if (Principal.scannPass == true && buscador == 0) {
                         llenarTabla();
                         llenarPuntos();
@@ -1285,16 +1253,15 @@ try {
 
 
 
+
     private void generarCantidad() {
         up += cantidad;
         retomarUnidades();
         cantidad = 0;
 
 
-
-
-
     }
+
 
     private void generarImporte() {
 
@@ -1302,25 +1269,37 @@ try {
 
         auxiliarDes=Double.parseDouble(descuento)/100;
         descuentoFinal = Double.parseDouble(variableS)*auxiliarDes;
-        BigDecimal bigDecimal=new BigDecimal(Double.parseDouble(variableS)- descuentoFinal).setScale(2, RoundingMode.UP);
+        BigDecimal bigDecimal=new BigDecimal(Double.parseDouble(variableS)- descuentoFinal).setScale(1, RoundingMode.UP);
         Total=bigDecimal.doubleValue();
         precioTXT.setText("$"+variableS);
+
         descuentoTXT.setText("%"+descuento);
 
-        totalTXT.setText("$"+String.valueOf(Total));
+        String precioFinal="";
+
+        String res=String.valueOf(Total);
+
+        String [] digito=res.split("\\.");
+
+        String[] decimal=digito[1].split(" ");
+
+        precioFinal+=digito[0];
+
+        if(decimal.length>1){
+            precioFinal+="."+decimal[0]+decimal[1];
+        }else{
+            precioFinal+="."+decimal[0];
+        }
+
+        totalTXT.setText("$"+precioFinal);
 
 
 
 
-        double resultado=Total * cantidad;
+        double resultado=Total * cantidad ;
         retomarImporte(resultado);
         pre += resultado;
         precio+=resultado;
-
-
-
-
-
 
     }
 
@@ -1335,7 +1314,7 @@ try {
         SQLiteDatabase db = conn.getReadableDatabase();
 
 
-        String sql = "SELECT id FROM contenedor WHERE estilo='" +sp2.getText().toString()+ "' and talla="+punto.getSelectedItem();
+        String sql = "SELECT id FROM contenedor WHERE estilo='" +sp2.getSelectedItem().toString()+ "' and talla="+punto.getSelectedItem();
 
         Cursor cursor = db.rawQuery(sql, null);
         while (cursor.moveToNext()) {
@@ -1349,10 +1328,10 @@ try {
         }
 
         if(idContenedor==0){
-            insertarPedido.start();
+            insertarPedido();
             //retomarPedidos();
         }else{
-            insertarRegistroIgual.start();
+            insertarRegistroIgual();
             //retomarPedidos();
         }
 
@@ -1362,7 +1341,13 @@ try {
 
 
 
+    public void ReinicarContadores(){
+        colorCantidad=0;
+        acabadoCantidad=0;
 
+        corridaCantidad=0;
+
+    }
 
 
 
@@ -1398,8 +1383,8 @@ try {
         Cursor cursor = db.rawQuery("SELECT SUM(cantidad) FROM " + Utilidades.TABLA_CONTENEDOR , null);
         while (cursor.moveToNext()) {
 
-                int contador=cursor.getInt(0);
-                unidadesTXT.setText(String.valueOf(contador+cantidad));
+            int contador=cursor.getInt(0);
+            unidadesTXT.setText(String.valueOf(contador+cantidad));
 
         }
 
@@ -1409,11 +1394,12 @@ try {
 
         listaMarca.clear();
         listaMarca.add(" ");
-        Principal.idAcabado=getAcabado(spAcabado.getSelectedItem().toString());
+
         try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="select DISTINCT  m.marca, numero from marcas m inner join articulo a on m.numero = a.marca where a.estilo = '"+sp2.getText()+"' and a.Color = "+Principal.idColor+" and a.acabado = "+Principal.idAcabado+"";
+            String sql="select DISTINCT  marca, numero from marcas";
             ResultSet rs = st.executeQuery(sql);
+
 
 
             while (rs.next()) {
@@ -1442,13 +1428,33 @@ try {
         while (cursor.moveToNext()) {
 
             double contador=cursor.getDouble(0);
-            importeTXT.setText(String.valueOf(contador+resultado));
+            String total=(String.valueOf(contador+resultado));
+
+            String precioFinal="";
+
+            String res=String.valueOf(total);
+
+            String [] digito=res.split("\\.");
+
+            String[] decimal=digito[1].split(" ");
+
+            precioFinal+=digito[0];
+
+            if(decimal.length>1){
+                precioFinal+="."+decimal[0]+decimal[1];
+            }else{
+                precioFinal+="."+decimal[0];
+            }
+
+            importeTXT.setText(precioFinal);
+
+        }
 
 
         }
 
 
-    }
+
     public void deleteContenedor(){
         ConexionSQLiteHelper conn = new ConexionSQLiteHelper(context, "db tienda", null, 1);
         SQLiteDatabase db = conn.getReadableDatabase();
@@ -1499,8 +1505,9 @@ try {
         if(estiloBar.equals("")){
             Toast.makeText(context, "Codigo de barras no existente en el sistema ", Toast.LENGTH_LONG).show();
         }
-        sp2.setText(estiloBar);
+       // sp2.setText(estiloBar);
         cargarDatosBarcode();
+
 
         llenarSp();
 
@@ -1513,12 +1520,9 @@ try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
             ResultSet rs = st.executeQuery("select a.ESTILO from colores c inner join articulo a on c.numero = a.color where a.BARCODE='"+barcode+"'");
 
-
             while (rs.next()) {
                 estilo=rs.getString(1);
             }
-
-
             st.close();
 
 
@@ -1526,6 +1530,38 @@ try {
             e.getMessage();
         }
         return estilo;
+    }
+    public void inicializarMarca(){
+        listaMarca.clear();
+        listaCorrida.clear();
+        puntos.clear();
+
+
+        spCorrida.setAdapter(null);
+        punto.setAdapter(null);
+        limpiarCajas();
+
+        ReinicarContadores();
+
+        contarSp4();
+        if(Principal.scannPass==true){
+            llenarSp4();
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaMarca);
+            spMarca.setAdapter(adapter);
+            spMarca.setSelection(obtenerPosicionItem(spMarca,marcaBar));
+        }else if(Principal.scannPass==false && marcaCantidad==1){
+            llenarSp4();
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaMarca);
+            spMarca.setAdapter(adapter);
+            spMarca.setSelection(1);
+
+
+        }else if(Principal.scannPass==false && marcaCantidad>1){
+            llenarSp4();
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),R.layout.spinner_item, listaMarca);
+            spMarca.setAdapter(adapter);
+
+        }
     }
 
     public static void cargarDatosBarcodeSimilar(String barcode){
@@ -1546,7 +1582,7 @@ try {
             }
             st.close();
             String estilo=getEstiloSimilar(barcode);
-            sp2.setText(estilo);
+            //sp2.setText(estilo);
             llenarSp();
             //
         } catch (SQLException e) {
@@ -1646,6 +1682,7 @@ try {
             fin = Double.valueOf(finn);
             medio = Double.valueOf(inc);
 
+
             for (double i = inicio; i < fin + medio; i = i + medio) {
 
                 puntosCantidad++;
@@ -1681,7 +1718,31 @@ try {
         lista.add("");
         try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="select DISTINCT c.color, numero from colores c inner join articulo a on c.numero = a.color where a.estilo = '"+sp2.getText()+"'";
+            String sql="select DISTINCT c.color, numero from colores c inner join articulo a on c.numero = a.color where a.estilo = '"+sp2.getSelectedItem()+"'  and a.marca="+idMarca;
+            ResultSet rs = st.executeQuery(sql);
+
+
+            while (rs.next()) {
+                add=rs.getString(1);
+                colorCantidad ++;
+                lista.add(add);
+            }
+            st.close();
+
+            //
+        } catch (Exception e) {
+
+        }
+    }
+
+    public  static void llenarMarca() {
+        lista.add(null);
+        lista.clear();
+        String add="";
+        lista.add("");
+        try {
+            Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
+            String sql="select DISTINCT marca, numero from colores c inner join articulo a on c.numero = a.color where a.estilo = '"+sp2.getSelectedItem()+"'  and a.marca="+idMarca;
             ResultSet rs = st.executeQuery(sql);
 
 
@@ -1705,7 +1766,7 @@ try {
         lista.add("");
         try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="select DISTINCT c.color, numero from colores c inner join articulo a on c.numero = a.color where a.estilo = '"+sp2.getText()+"'";
+            String sql="select DISTINCT c.color, numero from colores c inner join articulo a on c.numero = a.color where a.estilo = '"+sp2.getSelectedItem()+"'";
             ResultSet rs = st.executeQuery(sql);
 
 
@@ -1751,7 +1812,7 @@ try {
         Principal.idColor=getColor(spColor.getSelectedItem().toString());
         try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="select DISTINCT ac.Acabado, numero from acabados ac inner join articulo a on ac.numero = a.acabado where a.estilo = '"+sp2.getText()+"' and a.Color = "+Principal.idColor+"";
+            String sql="select DISTINCT ac.Acabado, numero from acabados ac inner join articulo a on ac.numero = a.acabado where a.estilo = '"+sp2.getSelectedItem()+"' and a.Color = "+Principal.idColor+"";
             ResultSet rs = st.executeQuery(sql);
 
             while (rs.next()) {
@@ -1790,10 +1851,10 @@ try {
 
         listaMarca.clear();
         listaMarca.add(" ");
-        Principal.idAcabado=getAcabado(spAcabado.getSelectedItem().toString());
+
         try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="select DISTINCT  m.marca, numero from marcas m inner join articulo a on m.numero = a.marca where a.estilo = '"+sp2.getText()+"' and a.Color = "+Principal.idColor+" and a.acabado = "+Principal.idAcabado+"";
+            String sql="select DISTINCT  marca, numero from marcas ";
             ResultSet rs = st.executeQuery(sql);
 
 
@@ -1807,6 +1868,72 @@ try {
 
 
         } catch (Exception e) {
+            Toast.makeText(getActivity(), "Error en sp4", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    public void contarEstilos() {
+
+
+
+        try {
+            Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
+            String sql="select estilo from articulo where marca="+spMarca.getId();
+            ResultSet rs = st.executeQuery(sql);
+
+
+
+
+            while (rs.next()) {
+
+                estiloCantidad++;
+                String add=(rs.getString(1));
+                String s=(rs.getString(2));
+
+            }
+            st.close();
+
+
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "Error en sp4", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+
+    public void llenarEstilos() {
+
+
+
+        listaEstilo=new ArrayList();
+        idMarca=getMarca(spMarca.getSelectedItem().toString());
+        try {
+            Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
+            String sql="select estilo from articulo where marca="+idMarca;
+            ResultSet rs = st.executeQuery(sql);
+
+
+
+
+            while (rs.next()) {
+
+                String estilo=(rs.getString(1));
+
+
+                if(!estilo.isEmpty()){
+                    listaEstilo.add(estilo);
+                }
+
+
+            }
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, listaEstilo);
+            sp2.setAdapter(adapter);
+            st.close();
+
+
+        } catch (Exception e) {
+            e.getMessage();
             Toast.makeText(getActivity(), "Error en sp4", Toast.LENGTH_SHORT).show();
         }
 
@@ -1834,12 +1961,13 @@ try {
 
     public void llenarSp5() {
         idMarca=getMarca(spMarca.getSelectedItem().toString());
+        Principal.idAcabado=getAcabado(spAcabado.getSelectedItem().toString());
         listaCorrida.clear();
         listaCorrida.add(" ");
 
         try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="select  co.Nombre as Corrida,  co.id from corridas co inner join articulo a on co.id = a.corrida where a.estilo = '"+sp2.getText()+"' and a.Color = "+Principal.idColor+" and a.acabado = "+Principal.idAcabado+" and a.marca =" +idMarca+"";
+            String sql="select  co.Nombre as Corrida,  co.id from corridas co inner join articulo a on co.id = a.corrida where a.estilo = '"+sp2.getSelectedItem()+"' and a.Color = "+Principal.idColor+" and a.acabado = "+Principal.idAcabado+" and a.marca =" +idMarca+"";
             ResultSet rs = st.executeQuery(sql);
 
 
@@ -1865,7 +1993,7 @@ try {
 
         try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="select  co.Nombre as Corrida,  co.id from corridas co inner join articulo a on co.id = a.corrida where a.estilo = '"+sp2.getText()+"' and a.Color = "+Principal.idColor+" and a.acabado = "+Principal.idAcabado+" and a.marca =" +idMarca+"";
+            String sql="select  co.Nombre as Corrida,  co.id from corridas co inner join articulo a on co.id = a.corrida where a.estilo = '"+sp2.getSelectedItem()+"' and a.Color = "+Principal.idColor+" and a.acabado = "+Principal.idAcabado+" and a.marca =" +idMarca+"";
             ResultSet rs = st.executeQuery(sql);
 
 
@@ -1893,7 +2021,7 @@ try {
             while (rs.next()) {
                 variableS=rs.getString(1);
                 descuento=rs.getString(2);
-                BigDecimal bigDecimal=new BigDecimal(Double.parseDouble(variableS)).setScale(2,RoundingMode.UP);
+                BigDecimal bigDecimal=new BigDecimal(Double.parseDouble(variableS)).setScale(1,RoundingMode.UP);
                 double subtotal=bigDecimal.floatValue();
                 precioTXT.setText(String.valueOf(subtotal));
                 descuentoTXT.setText("%"+descuento);
@@ -1914,11 +2042,31 @@ try {
         double Total;
         auxiliarDes=Double.parseDouble(descuento)/100;
         descuentoFinal = Double.parseDouble(variableS)*auxiliarDes;
-        BigDecimal bigDecimal=new BigDecimal(Double.parseDouble(variableS)- descuentoFinal).setScale(2,RoundingMode.UP);
+        BigDecimal bigDecimal=new BigDecimal(Double.parseDouble(variableS)- descuentoFinal).setScale(1,RoundingMode.UP);
         Total=bigDecimal.floatValue();
-        totalTXT.setText("$"+String.valueOf(Total));
+        String precioFinal="";
+        String res=String.valueOf(Total);
+
+        String [] digito=res.split("\\.");
+
+        String[] decimal=digito[1].split(" ");
+
+        precioFinal+=digito[0];
+
+        if(decimal.length>1){
+            precioFinal+="."+decimal[0]+decimal[1];
+        }else{
+            precioFinal+="."+decimal[0];
+        }
+
+
+        totalTXT.setText("$"+precioFinal);
+
+
 
     }
+
+
     public void limpiarCajas(){
         existenciasTXT.setText(null);
         totalTXT.setText(null);
@@ -1932,12 +2080,12 @@ try {
     }
 
     public void llenarTabla(){
-        String idCorrida=getIdCorrida();
+        Principal. idCorrida=getIdCorrida();
         where=" where ";
         if(buscador==0){
-            where+=" a.estilo = '"+sp2.getText()+"' and a.Color ="+Principal.idColor+" and a.acabado ="+Principal.idAcabado+" and a.marca ="+idMarca+" and a.corrida="+idCorrida;
+            where+=" a.estilo = '"+sp2.getSelectedItem()+"' and a.Color ="+Principal.idColor+" and a.acabado ="+Principal.idAcabado+" and a.marca ="+idMarca+" and a.corrida="+Principal.idCorrida;
         }else if(buscador==1){
-            where+=" a.estilo = '"+sp2.getText()+"' and a.marca ="+idMarca+" and a.corrida="+idCorrida;
+            where+=" a.estilo = '"+sp2.getSelectedItem()+"' and a.marca ="+idMarca+" and a.corrida="+Principal.idCorrida;
         }
 
         try {
@@ -2168,7 +2316,7 @@ try {
         Principal.idColor=getColor(spColor.getSelectedItem().toString());
         try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="select DISTINCT ac.Acabado, numero from acabados ac inner join articulo a on ac.numero = a.acabado where a.estilo = '"+sp2.getText()+"' and a.Color = "+Principal.idColor+"";
+            String sql="select DISTINCT ac.Acabado, numero from acabados ac inner join articulo a on ac.numero = a.acabado where a.estilo = '"+sp2.getSelectedItem()+"' and a.Color = "+Principal.idColor+"";
             ResultSet rs = st.executeQuery(sql);
 
 
@@ -2200,6 +2348,7 @@ try {
             while (cursor.moveToNext()) {
                 numeroT = (cursor.getString(0));
             }
+
         }catch (RuntimeException r){
 
         }catch (Exception e){
@@ -2230,6 +2379,7 @@ try {
 
         } catch (RuntimeException r){
 
+
         }catch (Exception e) {
             Toast.makeText(getActivity(),"",Toast.LENGTH_LONG).show();
         }
@@ -2240,8 +2390,9 @@ try {
         String idCorrida=null;
         try {
 
+
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql=" select corridas.id from corridas  inner join articulo on  corridas.id=articulo.corrida  where estilo='"+sp2.getText()+"' and marca="+idMarca +"and nombre='"+spCorrida.getSelectedItem()+"'";
+            String sql=" select corridas.id from corridas  inner join articulo on  corridas.id=articulo.corrida  where estilo='"+sp2.getSelectedItem()+"' and marca="+idMarca +"and nombre='"+spCorrida.getSelectedItem()+"'";
             ResultSet rs = st.executeQuery(sql);
 
 
@@ -2655,24 +2806,24 @@ try {
 
     private ArrayList<String[]>getPagos(){
 
-            ArrayList<String[]>rows=new ArrayList<>();
-            ConexionSQLiteHelper conn = new ConexionSQLiteHelper(getActivity(), "db tienda", null, 1);
-            SQLiteDatabase db = conn.getReadableDatabase();
+        ArrayList<String[]>rows=new ArrayList<>();
+        ConexionSQLiteHelper conn = new ConexionSQLiteHelper(getActivity(), "db tienda", null, 1);
+        SQLiteDatabase db = conn.getReadableDatabase();
 
 
-            Cursor cr = db.rawQuery("SELECT efectivo, formaPago FROM " + Utilidades.TABLA_PAGO , null);
-            while (cr.moveToNext()) {
+        Cursor cr = db.rawQuery("SELECT efectivo, formaPago FROM " + Utilidades.TABLA_PAGO , null);
+        while (cr.moveToNext()) {
 
-                String pago=cr.getString(0);
-                String forma=cr.getString(1);
+            String pago=cr.getString(0);
+            String forma=cr.getString(1);
 
-                rows.add(new String[] {forma,"$"+pago});
+            rows.add(new String[] {forma,"$"+pago});
 
-            }
+        }
 
         DecimalFormat formato= new DecimalFormat("#.##");
         rows.add(new String[] {"Cambio: ","$"+formato.format(cambio)});
-            return rows;
+        return rows;
 
     }
 
@@ -2688,7 +2839,7 @@ try {
 
 
 
-           rows.add(new String[] { " "," ","SubTotal: $"+df.format(subtotalTicket=Double.parseDouble(cr.getString(1))/1.16)});
+            rows.add(new String[] { " "," ","SubTotal: $"+df.format(subtotalTicket=Double.parseDouble(cr.getString(1))/1.16)});
 
         }
         return rows;
@@ -2862,7 +3013,7 @@ try {
         listaMarca.add("");
         try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="select DISTINCT  marcas.MARCA,articulo.MARCA   from articulo inner join marcas on articulo.MARCA=marcas.NUMERO where estilo='"+sp2.getText()+"' ";
+            String sql="select DISTINCT  marcas.MARCA,articulo.MARCA   from articulo inner join marcas on articulo.MARCA=marcas.NUMERO where estilo='"+sp2.getSelectedItem()+"' ";
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
                 add=rs.getString(1);
@@ -2887,7 +3038,7 @@ try {
 
         try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="select DISTINCT  co.Nombre as Corrida,  co.id from corridas co inner join articulo a on co.id = a.corrida where a.estilo = '"+sp2.getText()+"' and  a.marca =" +idMarca+"";
+            String sql="select DISTINCT  co.Nombre as Corrida,  co.id from corridas co inner join articulo a on co.id = a.corrida where a.estilo = '"+sp2.getSelectedItem()+"' and  a.marca =" +idMarca+"";
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
 
@@ -2917,7 +3068,7 @@ try {
                     "  left join empleado e on a.comprador=e.numero inner join departamentos d on a.DEPARTAMENTO=d.NUMERO\n" +
                     "  inner join tacones ta on a.TACON=ta.NUMERO inner join plantillas pl on a.PLANTILLA=pl.NUMERO inner join forros f on a.FORRO=f.NUMERO \n" +
                     "  inner join corridas co on a.corrida=co.id inner join suelas su on a.SUELA=su.numero inner join colores c on a.color = c.numero\n" +
-                    "  inner join acabados ac on a.ACABADO=ac.NUMERO inner join marcas ma on a.MARCA=ma.NUMERO left join imagenes im on a.id=im.id where a.estilo = '"+sp2.getText()+"' and a.marca = "+idMarca+" and a.corrida="+idCorrida;
+                    "  inner join acabados ac on a.ACABADO=ac.NUMERO inner join marcas ma on a.MARCA=ma.NUMERO left join imagenes im on a.id=im.id where a.estilo = '"+sp2.getSelectedItem()+"' and a.marca = "+idMarca+" and a.corrida="+idCorrida;
             ResultSet rs = st.executeQuery(sql);
 
             while (rs.next()) {
@@ -2991,7 +3142,7 @@ try {
 
 
 
-          String date="";
+            String date="";
 
             try {
 
@@ -3031,9 +3182,8 @@ try {
         }
     });
 
-    Thread insertarRegistroIgual= new Thread(new Runnable() {
-        @Override
-        public void run() {
+
+        public void insertarRegistroIgual() {
             ConexionSQLiteHelper conn = new ConexionSQLiteHelper(context, "db tienda", null, 1);
             SQLiteDatabase db=conn.getWritableDatabase();
 
@@ -3047,7 +3197,7 @@ try {
             pre=0;
 
         }
-    });
+
 
 
 
@@ -3105,19 +3255,19 @@ try {
         }
     });
 
+    //Corregir los errores
 
-    Thread insertarPedido= new Thread(new Runnable() {
-        @Override
-        public void run() {
+
+        public void insertarPedido() {
             ConexionSQLiteHelper conn = new ConexionSQLiteHelper(context, "db tienda", null, 1);
             SQLiteDatabase db=conn.getWritableDatabase();
-            String sql="INSERT INTO  contenedor (estilo, imagen, talla, cantidad, marca, color, sub, total, barcode,acabado,corrida, cliente,ubicacion, descuento) VALUES('"+sp2.getText().toString()+"', '"+idImagen+"', '"+punto.getSelectedItem()+"', '"+cantidadTXT.getText().toString()+"','"+spMarca.getSelectedItem()+"','"+color+"','"+variableS+"','"+pre+"','"+barcode+"','"+acabado+"','"+spCorrida.getSelectedItem()+"','"+clienteTXT.getText()+"','"+ubica+"', '"+descuento+"')";
+            String sql="INSERT INTO  contenedor (estilo, imagen, talla, cantidad, marca, color, sub, total, barcode,acabado,corrida, cliente,ubicacion, descuento) VALUES('"+sp2.getSelectedItem().toString()+"', '"+idImagen+"', '"+punto.getSelectedItem()+"', '"+cantidadTXT.getText().toString()+"','"+spMarca.getSelectedItem()+"','"+color+"','"+variableS+"','"+pre+"','"+barcode+"','"+acabado+"','"+spCorrida.getSelectedItem()+"','"+clienteTXT.getText()+"','"+ubica+"', '"+descuento+"')";
             db.execSQL(sql);
             db.close();
             pre=0;
 
         }
-    });
+
 
 
 
@@ -3160,6 +3310,7 @@ try {
         public void run() {
 
             try {
+
                 ConexionSQLiteHelper conn = new ConexionSQLiteHelper(getActivity(), "db tienda", null, 1);
                 SQLiteDatabase db = conn.getReadableDatabase();
 
@@ -3168,6 +3319,7 @@ try {
                 while (cursor.moveToNext()) {
                     buscador= Integer.parseInt(cursor.getString(0));
                 }
+
             }catch (Exception e){
 
             } finally {
@@ -3176,9 +3328,6 @@ try {
 
         }
     });
-
-
-
 
 
 

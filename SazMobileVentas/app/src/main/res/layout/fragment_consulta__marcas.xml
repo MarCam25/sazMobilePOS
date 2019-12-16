@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Ventas">
+    tools:context=".Consulta_Marcas">
+
 
 
     <ScrollView
@@ -23,18 +24,8 @@
                 android:orientation="vertical">
 
 
-                <Button
-                    android:id="@+id/btnBarCode"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginRight="10dp"
-                    android:background="@drawable/btn_buscar"
-                    android:text="Escanear"
-                    android:textAllCaps="false"
-                    android:textColor="#ffffff"
-                    android:textSize="20dp" />
+
+
 
 
                 <LinearLayout
@@ -48,6 +39,52 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:text="Marca"
+                        android:gravity="center"
+                        android:textColor="#3f3f40"
+                        android:textSize="20dp" />
+
+
+
+
+                </LinearLayout>
+
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+
+
+                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                        android:id="@+id/sp4"
+                        style="@style/spinner_style"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        />
+
+
+
+
+
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#f4f4f3"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
                         android:text="Estilo"
                         android:textColor="#3f3f40"
                         android:textSize="20dp" />
@@ -57,6 +94,17 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Color"
+                        android:gravity="center"
+                        android:textColor="#3f3f40"
+                        android:textSize="20dp" />
+
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Acabado"
+                        android:gravity="center"
                         android:textColor="#3f3f40"
                         android:textSize="20dp" />
 
@@ -67,23 +115,17 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="#f4f4f3"
                     android:orientation="horizontal">
 
-
-
-                    <EditText
+                    <Spinner
                         android:id="@+id/sp2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="0dp"
-                        android:background="#e2e2de"
-                        android:hint="Estilo"
                         android:layout_weight="1"
-                        android:textColor="#3f3f40"
-                        android:textSize="25dp"
-
+                        style="@style/spinner_style"
                         />
-
 
                     <Spinner
                         android:id="@+id/sp"
@@ -94,42 +136,6 @@
                         android:layout_weight="1"
                         android:clickable="true" />
 
-
-                </LinearLayout>
-
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#f4f4f3"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Acabado"
-                        android:textColor="#3f3f40"
-                        android:textSize="20dp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Marca"
-                        android:textColor="#3f3f40"
-                        android:textSize="20dp" />
-
-
-                </LinearLayout>
-
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#f4f4f3"
-                    android:orientation="horizontal">
-
                     <Spinner
                         android:id="@+id/sp3"
                         style="@style/spinner_style"
@@ -139,14 +145,6 @@
                         />
 
 
-                    <Spinner
-                        android:id="@+id/sp4"
-                        style="@style/spinner_style"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        />
-
 
                 </LinearLayout>
 
@@ -158,9 +156,10 @@
 
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
+                        android:gravity="center"
                         android:text="Corrida"
                         android:textColor="#3f3f40"
                         android:textSize="20dp" />
@@ -177,8 +176,6 @@
                         style="@style/spinner_style"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
-
-
                 </LinearLayout>
 
 
@@ -190,7 +187,7 @@
 
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:background="#f4f4f3"
@@ -198,7 +195,7 @@
                         android:paddingLeft="10dp"
                         android:text="Selecciona un punto"
                         android:textColor="#3f3f40"
-                        android:textSize="30dp" />
+                        android:textSize="20dp" />
 
                     <Spinner
                         android:id="@+id/punto"
@@ -226,6 +223,7 @@
                         android:textAllCaps="false"
                         android:textColor="#ffffff"
                         android:textSize="20dp" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
@@ -471,6 +469,7 @@
                         android:textSize="30dp"
                         android:textStyle="bold"
                         android:text="-"/>
+
                     <Button
                         android:id="@+id/btnAgregar"
                         android:layout_width="150dp"
@@ -535,7 +534,7 @@
                         android:text="VER EN OTRAS TIENDAS "
                         android:textAllCaps="false"
                         android:textColor="#ffffff"
-                       />
+                        />
 
                     <TextView
                         android:layout_marginTop="10dp"
@@ -561,7 +560,7 @@
 
 
 
-                    </LinearLayout>
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -690,13 +689,13 @@
                     android:textColor="#3f3f40"
                     android:textSize="25dp"
                     />
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:background="#f4f4f3"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="#f4f4f3"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
                     <Button
                         android:id="@+id/btnPagar"
@@ -714,15 +713,29 @@
 
 
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="5dp"
-                            android:background="#004d73"
-                            android:gravity="center"
-                            android:layout_marginTop="30dp"
-                            android:textColor="#3f3f40"
-                            android:textSize="25dp"
-                            />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="5dp"
+                        android:background="#004d73"
+                        android:gravity="center"
+                        android:layout_marginTop="30dp"
+                        android:textColor="#3f3f40"
+                        android:textSize="25dp"
+                        />
+
+                    <Button
+                        android:id="@+id/btnBarCode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginTop="5dp"
+                        android:visibility="invisible"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/btn_buscar"
+                        android:text="Escanear"
+                        android:textAllCaps="false"
+                        android:textColor="#ffffff"
+                        android:textSize="20dp" />
                 </LinearLayout>
 
 
@@ -731,6 +744,7 @@
         </LinearLayout>
 
     </ScrollView>
+
 
 
 </FrameLayout>

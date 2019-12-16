@@ -7,7 +7,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+
     <uses-feature android:name="android.permission.camera" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -21,6 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".scanMarca"></activity>
         <activity
             android:name=".Principal"
             android:screenOrientation="portrait">
@@ -55,7 +58,7 @@
             android:screenOrientation="portrait" />
         <activity android:name=".Configuraciones" />
         <activity android:name=".Similares" />
-        <activity android:name=".Tiendas"></activity>
+        <activity android:name=".Tiendas" />
     </application>
 
 </manifest>

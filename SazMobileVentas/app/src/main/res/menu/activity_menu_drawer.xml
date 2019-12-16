@@ -4,12 +4,20 @@
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
+        <item android:title="Buscar por:"/>
+
+
         <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/vender"
-            android:title="Ventas" />
-        <item
+            android:title="Estilo" />
 
+
+        <item
+            android:id="@+id/nav_manage"
+            android:icon="@drawable/vender"
+            android:title="Marca" />
+        <item
 
             android:id="@+id/nav_send"
             android:icon="@drawable/cerrar"
@@ -19,23 +27,9 @@
             android:id="@+id/nav_slideshow"
 
             android:title="" />
-        <item
-            android:id="@+id/nav_manage"
 
-            android:title="" />
     </group>
 
-    <item android:title="">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
 
-                android:title="" />
-            <item
-                android:id="@+id/nav_gallery"
-
-                android:title=""  />
-        </menu>
-    </item>
 
 </menu>

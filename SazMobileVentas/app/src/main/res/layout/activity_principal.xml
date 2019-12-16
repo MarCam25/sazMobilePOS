@@ -5,12 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Principal">
+
+
+
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbarPrincipal"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        app:popupTheme="@style/AppTheme.PopupOverlay" />
+        app:popupTheme="@style/AppTheme.PopupOverlay"
+        tools:ignore="MissingConstraints" />
 
 
 
@@ -26,6 +30,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/logotipo"
@@ -47,7 +52,7 @@
             />
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="130dp"
             android:layout_marginTop="20dp"

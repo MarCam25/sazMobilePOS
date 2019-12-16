@@ -49,7 +49,8 @@ public class Similares extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         validar();
         if(marcaV==0 &&  temporadaV==0&& clasificacionV==0 &&  sublineaV==0 && suelaV==0 && taconV==0 &&  colorV==0 &&  acabadoV==0 && corridaV==0) {
-            Toast.makeText(this, "No has configurado los similares", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(this, "No has configurados los similares", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No tienes configurados los similares", Toast.LENGTH_SHORT).show();
         }else{
             consultarSimilares();
         }
@@ -73,7 +74,7 @@ public class Similares extends AppCompatActivity {
                     "  left join empleado e on a.comprador=e.numero inner join departamentos d on a.DEPARTAMENTO=d.NUMERO\n" +
                     "  inner join tacones ta on a.TACON=ta.NUMERO inner join plantillas pl on a.PLANTILLA=pl.NUMERO inner join forros f on a.FORRO=f.NUMERO \n" +
                     "  inner join corridas co on a.corrida=co.id inner join suelas su on a.SUELA=su.numero inner join colores c on a.color = c.numero\n" +
-                    "  inner join acabados ac on a.ACABADO=ac.NUMERO inner join marcas ma on a.MARCA=ma.NUMERO left join imagenes im on a.id=im.id inner join clasific clas on a.CLASIFIC=clas.numero inner join existen ex on a.barcode = ex.barcode and ex.CANTIDAD>0 "+where;
+                    "  inner join acabados ac on a.ACABADO=ac.NUMERO inner join marcas ma on a.MARCA=ma.NUMERO left join imagenes im on a.id=im.id inner join clasific clas on a.CLASIFIC=clas.numero inner join existen ex on a.barcode = ex.barcode and ex.CANTIDAD>0 "+where+ " and ex.Tienda="+tienda+" and talla="+Principal.punto;
             ResultSet rs = st.executeQuery(sql);
 
 
@@ -102,6 +103,7 @@ public class Similares extends AppCompatActivity {
 
         } catch (SQLException xe) {
             xe.getMessage();
+            Toast.makeText(getApplicationContext(),"No tienes configurados los similares",Toast.LENGTH_LONG).show();
 
         }
     }
@@ -236,6 +238,7 @@ public class Similares extends AppCompatActivity {
             ResultSet rs = st.executeQuery(sql);
 
 
+
             while (rs.next()) {
 
 
@@ -243,6 +246,7 @@ public class Similares extends AppCompatActivity {
 
 
             }
+            st.close();
 
             // Toast.makeText(Principal.this,"Inicio de sesion Exitosa...!!!: " + empresa, Toast.LENGTH_LONG).show();
         } catch (Exception e) {
@@ -263,12 +267,9 @@ public class Similares extends AppCompatActivity {
 
 
             while (rs.next()) {
-
-
                 color=rs.getString(1);
-
-
             }
+            st.close();
 
             // Toast.makeText(Principal.this,"Inicio de sesion Exitosa...!!!: " + empresa, Toast.LENGTH_LONG).show();
         } catch (Exception e) {
@@ -295,6 +296,7 @@ public class Similares extends AppCompatActivity {
 
 
             }
+            st.close();
 
             // Toast.makeText(Principal.this,"Inicio de sesion Exitosa...!!!: " + empresa, Toast.LENGTH_LONG).show();
         } catch (Exception e) {

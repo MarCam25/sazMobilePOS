@@ -9,7 +9,8 @@ import com.google.zxing.Result;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class Scann extends AppCompatActivity  implements ZXingScannerView.ResultHandler{
+public class scanMarca extends AppCompatActivity  implements ZXingScannerView.ResultHandler {
+
 
     TextView codigo;
     ZXingScannerView scannerView;
@@ -19,20 +20,17 @@ public class Scann extends AppCompatActivity  implements ZXingScannerView.Result
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scann);
+        setContentView(R.layout.activity_scan_marca);
 
         scannerView=new ZXingScannerView(this);
         setContentView(scannerView);
     }
 
-
     @Override
     public void handleResult(Result result) {
-        Consulta_Marcas.cargarDatos(result.getText());
+        Ventas.cargarDatos(result.getText());
         onBackPressed();
     }
-
-
 
     @Override
     protected void onPause() {
@@ -40,11 +38,10 @@ public class Scann extends AppCompatActivity  implements ZXingScannerView.Result
         scannerView.stopCamera();
     }
 
+
     @Override
-    protected void onResume() {
-        super.onResume();
+    public void onPointerCaptureChanged(boolean hasCapture) {
         scannerView.setResultHandler(this);
         scannerView.startCamera();
     }
-
 }

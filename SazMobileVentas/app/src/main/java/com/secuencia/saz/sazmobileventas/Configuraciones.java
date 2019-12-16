@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -23,13 +24,14 @@ public class Configuraciones extends AppCompatActivity {
     private static CheckBox CheckBusqueda,CheckIva;
 
 
+
+
     Button guardar;
 
-    int iva=0, buscador=0;
+    int iva=0, buscador=0 , buscador2=0;;
 
     CheckBox checkMarca, checkTemporada, checkClasificacion, checkSubLinea, checkSuela, checkTacon, checkColor, checkAcabado, checkCorrida;
-
-
+    CheckBox CheckBusqueda2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,8 @@ public class Configuraciones extends AppCompatActivity {
         checkColor=(CheckBox)findViewById(R.id.CheckColor);
         checkAcabado=(CheckBox)findViewById(R.id.CheckAcabado);
         checkCorrida=(CheckBox)findViewById(R.id.CheckCorrida);
+        CheckBusqueda2=(CheckBox)findViewById(R.id.checkBoxMarca);
+
 
 
 
@@ -63,6 +67,24 @@ public class Configuraciones extends AppCompatActivity {
         if(buscador==1){
             CheckBusqueda.setChecked(true);
         }
+        if(buscador2==1){
+            CheckBusqueda2.setChecked(true);
+        }
+
+
+        CheckBusqueda.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CheckBusqueda2.setChecked(false);
+            }
+        });
+
+        CheckBusqueda2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CheckBusqueda.setChecked(false);
+            }
+        });
 
 
         guardar.setOnClickListener(new View.OnClickListener() {
@@ -86,6 +108,11 @@ public class Configuraciones extends AppCompatActivity {
 
                 if(CheckBusqueda.isChecked()==true){
                     insertCheckBuscador();
+
+                }
+
+                if(CheckBusqueda2.isChecked() == true){
+                    insertCheckBuscador2();
 
                 }
 
@@ -219,19 +246,35 @@ public class Configuraciones extends AppCompatActivity {
 
 
     public void buscador(){
-
+        String contenedor="",contenedor2="";
         try {
             ConexionSQLiteHelper conn = new ConexionSQLiteHelper(getApplicationContext(), "db tienda", null, 1);
             SQLiteDatabase db = conn.getReadableDatabase();
 
-            String sql="SELECT "+Utilidades.CAMPO_BUSCADOR+" FROM "+Utilidades.TABLA_CHECKB;
+            String sql="SELECT "+Utilidades.CAMPO_BUSCADOR+","+Utilidades.CAMPO_BUSCADOR2+" FROM "+Utilidades.TABLA_CHECKB;
             Cursor cursor = db.rawQuery(sql, null);
             while (cursor.moveToNext()) {
-                buscador= Integer.parseInt(cursor.getString(0));
-            }
-        }catch (RuntimeException r){
+                contenedor= cursor.getString(0);
+                contenedor2= cursor.getString(1);
 
+                if(contenedor==null)
+                {
+
+                }else{
+                    buscador=Integer.parseInt(contenedor);
+                }
+
+                if(contenedor2==null)
+                {
+
+                }else{
+                    buscador2=Integer.parseInt(contenedor2);
+                }
+
+            }
         }catch (Exception e){
+
+            e.getMessage();
 
         }
 
@@ -480,4 +523,64 @@ public class Configuraciones extends AppCompatActivity {
 
     }
 
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            consultarBuscador();
+
+
+            Intent intent = new Intent(getApplicationContext(), menu.class);
+            startActivity(intent);
+
+
+        }
+        return true;
+    }
+
+    public void consultarBuscador(){
+        int buscadore=0;
+        String contenedor="";
+        try {
+            ConexionSQLiteHelper conn = new ConexionSQLiteHelper(getApplicationContext(), "db tienda", null, 1);
+            SQLiteDatabase db = conn.getReadableDatabase();
+
+            String sql="SELECT "+Utilidades.CAMPO_BUSCADOR2+" FROM "+Utilidades.TABLA_CHECKB;
+            Cursor cursor = db.rawQuery(sql, null);
+            while (cursor.moveToNext()) {
+                contenedor= cursor.getString(0);
+            }
+
+            if(contenedor==null) {
+
+                Principal.busqueda2 = false;
+                Principal.passConsulta = true;
+
+            }else{
+                buscadore=Integer.parseInt(contenedor);
+                if (buscadore == 1) {
+                    Principal.busqueda2 = true;
+                    Principal.passConsulta = false;
+                } else {
+                    Principal.busqueda2 = false;
+                    Principal.passConsulta = true;
+                }
+            }
+        }catch (Exception e){
+
+            Principal.busqueda2 = false;
+            Principal.passConsulta = true;
+        } finally {
+
+        }
+
+    }
+
+    public void insertCheckBuscador2() {
+        ConexionSQLiteHelper conn = new ConexionSQLiteHelper(this, "db tienda", null, 1);
+        SQLiteDatabase db = conn.getWritableDatabase();
+
+
+        db.execSQL("INSERT INTO  "+Utilidades.TABLA_CHECKB +" ("+Utilidades.CAMPO_BUSCADOR2+") VALUES('1')");
+
+
+    }
 }

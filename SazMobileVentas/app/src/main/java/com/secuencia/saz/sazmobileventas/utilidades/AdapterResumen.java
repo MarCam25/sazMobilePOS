@@ -21,26 +21,22 @@ import com.secuencia.saz.sazmobileventas.Modelo.ModeloEmpresa;
 import com.secuencia.saz.sazmobileventas.Modelo.ModeloImagen;
 import com.secuencia.saz.sazmobileventas.Modelo.ModeloResumen;
 import com.secuencia.saz.sazmobileventas.R;
-import com.secuencia.saz.sazmobileventas.Resumen;
+
 import com.secuencia.saz.sazmobileventas.Ventas;
 import com.secuencia.saz.sazmobileventas.conexion.ConexionBDCliente;
 import com.secuencia.saz.sazmobileventas.conexion.ConexionSQLiteHelper;
-import com.secuencia.saz.sazmobileventas.conexion.ConexionSqlServer;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+
 
 public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHolderResumen> {
 
     public static ModeloEmpresa me=new ModeloEmpresa();
     public static ConexionBDCliente bdc=new ConexionBDCliente();
-    ConexionSqlServer conex=new ConexionSqlServer();
     int existencias=0;
     double precioUnidad;
     ArrayList<ModeloResumen> listResumen;
@@ -62,7 +58,7 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolderResumen holder, int position) {
+    public void onBindViewHolder(final ViewHolderResumen holder,final int position) {
         holder.estilo.setText(listResumen.get(position).getEstilo());
         holder.marca.setText(listResumen.get(position).getMarca());
         holder.color.setText(listResumen.get(position).getColor());
@@ -91,22 +87,6 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
         holder.eliminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              /*  int res,cantidadAnterior= Ventas.up ,cantidad=Integer.parseInt(holder.cant.getText().toString());
-                res=cantidadAnterior-cantidad;
-                Ventas.up=res;
-                Ventas.unidadesTXT.setText(String.valueOf(Ventas.up));
-
-                double resImporte, importeAnterior=Ventas.pre,ImporteActual=Double.parseDouble(holder.total.getText().toString());
-                resImporte=importeAnterior-ImporteActual;
-                Ventas.pre=resImporte;
-                Ventas.importeTXT.setText(String.valueOf(resImporte));
-
-                */
-
-               /* int resExist, existenciaAnterior=ConsultaF.existencias,existenciasActual=Integer.parseInt(holder.cant.getText().toString());
-                resExist=existenciaAnterior+existenciasActual;
-                ConsultaF.existencias=resExist;
-                ConsultaF.existenciasTXT.setText(String.valueOf(resExist));*/
 
 
                 AlertDialog.Builder alerta = new AlertDialog.Builder(context );
@@ -119,8 +99,8 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
 
                                 String id= holder.id.getText().toString();
                                 eliminar(holder);
-                                Intent intent=new Intent(context,Resumen.class);
-                                context.startActivity(intent);
+                                removeItem(position);
+                                notifyDataSetChanged();
 
 
                             }
@@ -221,6 +201,7 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
             Statement st = bdc.conexionBD(me.getServer(), me.getBase(), me.getUsuario(), me.getPass()).createStatement();
             String sql="update existen set cantidad = cantidad + " + holder.cant.getText() + " ,  pedido = pedido - " + holder.cant.getText() + " where barcode ='" + holder.bar.getText() + "' and talla = " + holder.punto.getText() + " and tienda = " + Ventas.listado;
             st.executeUpdate(sql);
+            st.close();
 
         }catch (Exception e) {
             Toast.makeText(context, "Error al devolver productos", Toast.LENGTH_SHORT).show();
@@ -265,22 +246,19 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
 
         try {
 
-            List<Map<String, String>> data = null;
-            data = new ArrayList<Map<String, String>>();
+
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
             String punto=holder.punto.getText().toString();
             String barcode=holder.bar.getText().toString();
-            ResultSet rs = st.executeQuery("lupita'"+barcode+"',"+punto+","+ultimaVez());
-            ResultSetMetaData rsmd=rs.getMetaData();
+            ResultSet rs = st.executeQuery("lupitaApartados'"+barcode+"',"+punto+","+ultimaVez()+",''");
+
             while(rs.next()) {
 
 
                 existencias=(rs.getInt(2));
 
-
-
-
             }
+            st.close();
 
         } catch (SQLException e1) {
             e1.printStackTrace();
@@ -291,6 +269,13 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
 
 
     }
+
+    public void removeItem(int position) {
+        this.listResumen.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, getItemCount() - position);
+    }
+
 
     public String ultimaVez(){
         String numeroT=null;
@@ -314,27 +299,32 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
     }
 
 
+
     public void upDateExistencias(final ViewHolderResumen holder){
         try {
 
 
             Statement st = bdc.conexionBD(me.getServer(), me.getBase(), me.getUsuario(), me.getPass()).createStatement();
-            String sql="update existen set cantidad = cantidad - 1 ,  pedido = pedido + 1  where barcode ='" + holder.bar.getText()+ "' and talla = " + holder.punto.getText() + " and tienda = " + ultimaVez();
+            String sql="update existen set cantreal = cantreal + 1 ,  pedido = pedido + 1  where barcode ='" + holder.bar.getText()+ "' and talla = " + holder.punto.getText() + " and tienda = " + ultimaVez();
             st.executeUpdate(sql);
+            st.close();
 
         }catch (Exception e) {
             Toast.makeText(context, "Error al finalizar el pedido", Toast.LENGTH_SHORT).show();
         }
 
     }
+
+
 
     public void upDateExistenciasMenos(final ViewHolderResumen holder){
         try {
 
 
             Statement st = bdc.conexionBD(me.getServer(), me.getBase(), me.getUsuario(), me.getPass()).createStatement();
-            String sql="update existen set cantidad = cantidad + 1 ,  pedido = pedido - 1  where barcode ='" + holder.bar.getText()+ "' and talla = " + holder.punto.getText() + " and tienda = " + ultimaVez();
+            String sql="update existen set cantreal = cantReal - 1 ,  pedido = pedido - 1  where barcode ='" + holder.bar.getText()+ "' and talla = " + holder.punto.getText() + " and tienda = " + ultimaVez();
             st.executeUpdate(sql);
+            st.close();
 
         }catch (Exception e) {
             Toast.makeText(context, "Error al finalizar el pedido", Toast.LENGTH_SHORT).show();
@@ -342,20 +332,7 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
 
     }
 
-    /*
 
-    public void eliminarPedido(final ViewHolderResumen holder){
-        ConexionSQLiteHelper conn = new ConexionSQLiteHelper(context, "db tienda", null, 1);
-
-
-        SQLiteDatabase db = conn.getReadableDatabase();
-
-        db.execSQL("DELETE FROM pedido WHERE id="+holder.id.getText());
-
-
-        db.close();
-    }
-    */
     public void consultarPrecio(final ViewHolderResumen holder){
         try {
             Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
@@ -365,6 +342,7 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
             while (rs.next()) {
                 precioUnidad=rs.getDouble(1);
             }
+            st.close();
 
 
         } catch (Exception e) {
@@ -381,7 +359,7 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
 
         TextView estilo, marca, color, punto, cant,sub,total,bar,id, imagen, acabado;
 
-        Button foto,eliminar,editar,btnMas,btnMenos;
+        Button foto,eliminar,btnMas,btnMenos;
 
         public ViewHolderResumen(@NonNull View itemView) {
             super(itemView);
@@ -401,7 +379,7 @@ public class AdapterResumen extends RecyclerView.Adapter<AdapterResumen.ViewHold
             acabado=(TextView)itemView.findViewById(R.id.idAcabado);
             btnMas=(Button)itemView.findViewById(R.id.btnMas);
             btnMenos=(Button)itemView.findViewById(R.id.btnMenos);
-            // editar=(Button)itemView.findViewById(R.id.idEditar);
+
             context=itemView.getContext();
 
 

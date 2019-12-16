@@ -22,8 +22,7 @@ public class Detalle extends AppCompatActivity {
     String style, valores, numero, marca, id;
     String [] separado;
     String idImagen;
-    TextView imagen;
-    String foto;
+
     ImageView imagenView;
 
     String empress;
@@ -47,7 +46,7 @@ public class Detalle extends AppCompatActivity {
         obtenerLineaConexion();
 
 
-      //  Toast.makeText(getApplicationContext(), ""+valores, Toast.LENGTH_SHORT).show();
+
         estilo=(TextView)findViewById(R.id.estilo);
         color=(TextView)findViewById(R.id.color);
         acabado=(TextView)findViewById(R.id.acabado);
@@ -76,11 +75,12 @@ public class Detalle extends AppCompatActivity {
 
         llenarTabla();
         getImagen();
+
     }
 
 
     public void obtenerLineaConexion() {
-        //  String empress = getIntent().getStringExtra("Empresa");
+
 
 
         me = new ModeloEmpresa();
@@ -100,8 +100,9 @@ public class Detalle extends AppCompatActivity {
 
 
                 }
+                st.close();
+                conex.conexionBD().close();
 
-                // Toast.makeText(Principal.this,"Inicio de sesion Exitosa...!!!: " + empresa, Toast.LENGTH_LONG).show();
             } catch (Exception e) {
                 Toast.makeText(getApplicationContext(), "Error en la linea de conexion", Toast.LENGTH_SHORT).show();
             }
@@ -116,7 +117,7 @@ public class Detalle extends AppCompatActivity {
                     "  left join empleado e on a.comprador=e.numero inner join departamentos d on a.DEPARTAMENTO=d.NUMERO\n" +
                     "  inner join tacones ta on a.TACON=ta.NUMERO inner join plantillas pl on a.PLANTILLA=pl.NUMERO inner join forros f on a.FORRO=f.NUMERO \n" +
                     "  inner join corridas co on a.corrida=co.id inner join suelas su on a.SUELA=su.numero inner join colores c on a.color = c.numero\n" +
-                    "  inner join acabados ac on a.ACABADO=ac.NUMERO inner join marcas ma on a.MARCA=ma.NUMERO left join imagenes im on a.id = im.id where a.estilo = '"+style+"' and a.marca = "+marca+"";
+                    "  inner join acabados ac on a.ACABADO=ac.NUMERO inner join marcas ma on a.MARCA=ma.NUMERO left join imagenes im on a.id = im.id where a.estilo = '"+Principal.estilo+"' and a.marca = "+marca+" and a.acabado="+Principal.idAcabado+" and a.color="+Principal.idColor+" and a.corrida="+Principal.idCorrida;
             ResultSet rs = st.executeQuery(sql);
 
             while (rs.next()) {
@@ -150,6 +151,8 @@ public class Detalle extends AppCompatActivity {
                 idImagen=rs.getString(27);
             }
 
+            st.close();
+            conex.conexionBD().close();
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Error en llenar la lista", Toast.LENGTH_SHORT).show();
         }
@@ -171,6 +174,9 @@ public class Detalle extends AppCompatActivity {
                 imagenView.setImageBitmap(bmap);
 
             }
+
+            st.close();
+
 
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Error en llenar la lista", Toast.LENGTH_SHORT).show();

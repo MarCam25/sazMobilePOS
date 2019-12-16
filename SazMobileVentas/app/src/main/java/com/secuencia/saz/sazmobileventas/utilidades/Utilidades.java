@@ -75,10 +75,12 @@ public class Utilidades {
     public static final String CREAR_TABLA_ZONA="CREATE TABLE "+TABLA_ZONA+"( "+CAMPO_IDZ+" INTEGER PRIMARY KEY AUTOINCREMENT, "+CAMPO_ZONA+ " TEXT )";
 
 
+
     public static final String TABLA_CAJA="caja";
     public static final String CAMPO_IDCAJA="id";
     public static final String CAMPO_NOMBRECAJA="nombreCaja";
     public static final String CREAR_TABLA_CAJA="CREATE TABLE "+TABLA_CAJA+"( "+CAMPO_IDCAJA+" INTEGER PRIMARY KEY AUTOINCREMENT,"+CAMPO_NOMBRECAJA+" TEXT )";
+
 
     public static final String TABLA_PAGO="pago";
     public static final String CAMPO_IDPAGO="id";
@@ -86,16 +88,19 @@ public class Utilidades {
     public static final String CAMPO_FORMAPAGO="formaPago";
     public static final String CREAR_TABLA_PAGO="CREATE TABLE "+TABLA_PAGO+"( "+CAMPO_IDPAGO+" INTEGER PRIMARY KEY AUTOINCREMENT,"+CAMPO_EFECTIVO+" TEXT,"+CAMPO_FORMAPAGO+" TEXT )";
 
+
     public static final String TABLA_CHECKI="checkIva";
     public static final String CAMPO_IDCHECKI="id";
     public static final String CAMPO_IVA="iva";
     public static final String CREAR_TABLA_CHECKI="CREATE TABLE "+TABLA_CHECKI+"( "+CAMPO_IDCHECKI+" INTEGER PRIMARY KEY AUTOINCREMENT,"+CAMPO_IVA+" TEXT )";
 
+
+
     public static final String TABLA_CHECKB="checkBuscador";
     public static final String CAMPO_IDCHECKB="id";
     public static final String CAMPO_BUSCADOR="buscador";
-    public static final String CREAR_TABLA_CHECKB="CREATE TABLE "+TABLA_CHECKB+"( "+CAMPO_IDCHECKB+" INTEGER PRIMARY KEY AUTOINCREMENT,"+CAMPO_BUSCADOR+" TEXT )";
-
+    public static final String CAMPO_BUSCADOR2="buscador2";
+    public static final String CREAR_TABLA_CHECKB="CREATE TABLE "+TABLA_CHECKB+"( "+CAMPO_IDCHECKB+" INTEGER PRIMARY KEY AUTOINCREMENT,"+CAMPO_BUSCADOR+" TEXT,"+CAMPO_BUSCADOR2+" TEXT  )";
 
 
 

@@ -28,15 +28,8 @@ import java.util.ArrayList;
 
 public class Resumen extends AppCompatActivity {
 
-    String  contendedor;
-
-    String[] resumen,fila;
-    public static ConexionBDCliente bdc=new ConexionBDCliente();
-    GridView gridview;
     public static ModeloEmpresa me=new ModeloEmpresa();
-    ModeloUsuario mu=new ModeloUsuario();
-    ModeloDatos md=new ModeloDatos();
-    ArrayList<String> arrayList;
+
 
     RecyclerView recyclerView;
     ArrayList<ModeloResumen> listaResumen;
@@ -58,17 +51,11 @@ public class Resumen extends AppCompatActivity {
         verificar();
 
         if(verificador==0){
-            Toast toast = Toast.makeText(this, "No tienes productos agregados", Toast.LENGTH_LONG);
-            TextView x = (TextView) toast.getView().findViewById(android.R.id.message);
-            x.setTextColor(Color.YELLOW); toast.show();
+            Toast.makeText(this, "No tienes productos agregados", Toast.LENGTH_LONG).show();
+
         }
 
         mostrar();
-
-
-
-
-
 
     }
 
@@ -80,7 +67,6 @@ public class Resumen extends AppCompatActivity {
             Principal.menu=true;
             Principal.banco=true;
             Intent intent = new Intent(getApplicationContext(), menu.class);
-
 
             startActivity(intent);
         }
@@ -112,35 +98,14 @@ public class Resumen extends AppCompatActivity {
             mr.setTotal(cursor.getString(8));
             mr.setBarcode(cursor.getString(9));
             mr.setAcabado(cursor.getString(10));
-
-
-
-
-
-
-
             listaResumen.add(mr);
-
-
-
-
 
         }
     }
 
 
 
-
-
-
-
-
-
-
-
     public void verificar(){
-
-        ModeloResumen mr=null;
 
         ConexionSQLiteHelper conn = new ConexionSQLiteHelper(this, "db tienda", null, 1);
         SQLiteDatabase db = conn.getReadableDatabase();

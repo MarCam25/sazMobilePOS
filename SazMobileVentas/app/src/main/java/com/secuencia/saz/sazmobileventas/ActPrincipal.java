@@ -39,52 +39,34 @@ public class ActPrincipal extends AppCompatActivity {
     String usuario, nombreUsuario, numeroUsuario;
 
     String empresa;
-    ConexionSqlServer conex=new ConexionSqlServer();
     ModeloEmpresa me=new ModeloEmpresa();
     ConexionBDCliente bdc=new ConexionBDCliente();
     Button acep;
     String tienda;
-    ModeloDatos md=new ModeloDatos();
     CheckBox check;
     ArrayList listaTiendas=new ArrayList();
     ArrayList listaZonas=new ArrayList();
     EditText edtCaja;
-
     public String numeroTienda;
     private Spinner spTiendas, spZona;
     ConexionSQLiteHelper conn=new ConexionSQLiteHelper(this,"db tienda",null,1);
-    String repetido;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_act_principal);
 
-
-
         getSupportActionBar().setTitle("SazMobile POS App ");
-
         spTiendas=(Spinner)findViewById(R.id.spTiendas);
         spZona=(Spinner)findViewById(R.id.spZona);
         check=(CheckBox)findViewById(R.id.check);
         edtCaja=(EditText)findViewById(R.id.edtCaja);
         edtCaja.setText(obtenerCaja());
-        crearComanderoLog();
-        crearComanderoDet();
-        crearUbicacionTabla();
-        crearAreaAsignadaTabla();
-        crearZonaTabla();
-        crearComanderoTabla();
-        crearAreasTabla();
+
         dropSP();
         crearSp();
-
-
         obtenerTiendas();
-
-
-
-
 
         ArrayAdapter<String> adapterTiendas = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_item, listaTiendas);
         spTiendas.setAdapter(adapterTiendas);
@@ -101,8 +83,6 @@ public class ActPrincipal extends AppCompatActivity {
                 adapterZonas.clear();
                 obtenerNumeroTienda();
                 consultarZona();
-
-
                 spZona.setAdapter(adapterZonas);
 
             }
@@ -128,12 +108,8 @@ public class ActPrincipal extends AppCompatActivity {
 
 
                     if (!edtCaja.getText().toString().isEmpty()) {
-
                         obtenerNumero();
-
-
-                        guardarCaja();
-
+                        guardarCaja.start();
                     } else {
                         Toast.makeText(getApplicationContext(), "No has ingresado ninguna caja ", Toast.LENGTH_LONG).show();
                     }
@@ -166,7 +142,7 @@ public class ActPrincipal extends AppCompatActivity {
                 usuario= getIntent().getStringExtra("Usuario");
                 empresa=getIntent().getStringExtra("Empresa");
                 getNameUser();
-                insertarEntrada();
+                insertarEntrada.start();
 
                 Intent inte= new Intent(getApplicationContext(), menu.class);
                 inte.putExtra("listado",numeroTienda);
@@ -182,13 +158,8 @@ public class ActPrincipal extends AppCompatActivity {
                 values.put(Utilidades.CAMPOS_STATTUS,"3");
                 Long idResultante=db.insert(Utilidades.TABLA_TIENDA,Utilidades.CAMPOS_NOMBRE,values);
                 db.close();
+                actualizar.start();
 
-
-
-                actualizar();
-
-                insertarAreaAsignada();
-                //aqui va
                 startActivity(inte);
 
             }
@@ -199,53 +170,6 @@ public class ActPrincipal extends AppCompatActivity {
         }
     }
 
-
-    public void entrarSinArea(){
-        try {
-            Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            ResultSet rs = st.executeQuery("select numero from tiendas where nombre='"+spTiendas.getSelectedItem()+"'");
-
-
-            while (rs.next()) {
-
-
-                numeroTienda=rs.getString(1);
-
-                usuario= getIntent().getStringExtra("Usuario");
-                empresa=getIntent().getStringExtra("Empresa");
-                getNameUser();
-                insertarEntrada();
-
-                Intent inte= new Intent(getApplicationContext(), Principal.class);
-                inte.putExtra("listado",numeroTienda);
-                inte.putExtra("Usuario",usuario);
-                inte.putExtra("Empresa",empresa);
-
-
-                SQLiteDatabase db=conn.getWritableDatabase();
-                ContentValues values=new ContentValues();
-
-                values.put(Utilidades.CAMPOS_NOMBRE,numeroTienda);
-                values.put(Utilidades.CAMPOS_DATOS,"aa"+"-"+"aa"+"-"+"aa"+"-"+"aa"+"-"+"aa"+"-"+"aa"+"-"+"aa");
-                values.put(Utilidades.CAMPOS_STATTUS,"3");
-                Long idResultante=db.insert(Utilidades.TABLA_TIENDA,Utilidades.CAMPOS_NOMBRE,values);
-                db.close();
-
-
-
-                actualizar();
-
-                insertarAreaAsignada();
-                startActivity(inte);
-
-            }
-
-
-        } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "Error en sp", Toast.LENGTH_SHORT).show();
-        }
-
-    }
 
     public void obtenerNumeroTienda(){
         try {
@@ -268,35 +192,8 @@ public class ActPrincipal extends AppCompatActivity {
     }
 
 
-    public void actualizarZona(String zona){
 
 
-
-        ConexionSQLiteHelper conn = new ConexionSQLiteHelper(this, "db tienda", null, 1);
-        SQLiteDatabase db=conn.getWritableDatabase();
-
-
-
-
-        db.execSQL("UPDATE zona SET zona="+zona+"");
-
-
-
-    }
-
-    public void actualizar(){
-        SQLiteDatabase db=conn.getReadableDatabase();
-        String[] parametros={"1"};
-        ContentValues values=new ContentValues();
-        try {
-            values.put(Utilidades.CAMPOS_NOMBRE,numeroTienda);
-            db.update(Utilidades.TABLA_TIENDA,values,Utilidades.CAMPO_ID+"=?",parametros);
-            db.close();
-        }catch (Exception e){
-            Toast.makeText(getApplicationContext(),"no pos no" , Toast.LENGTH_LONG).show();
-        }
-
-    }
     public void ultimaVez(){
         ConexionSQLiteHelper conn = new ConexionSQLiteHelper(this, "db tienda", null, 1);
         SQLiteDatabase db = conn.getReadableDatabase();
@@ -344,7 +241,6 @@ public class ActPrincipal extends AppCompatActivity {
                 listaZonas.add(rs.getString(1));
 
 
-
             }
 
 
@@ -374,25 +270,6 @@ public class ActPrincipal extends AppCompatActivity {
     }
 
 
-    private void insertarEntrada() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-hhmmss", Locale.getDefault());
-        Date date = new Date();
-
-        String fecha = dateFormat.format(date);
-
-        String[] FechaHora;
-        FechaHora=fecha.split("-");
-
-        try {
-            Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            st.executeUpdate("insert into logdia (nombre, fecha, tienda, hora,origen, tipo, idEmpleado, caja, id, llave, autoriza) values ('"+nombreUsuario+"', getDate(),1,'getDate()', 1, 'ENTRADA',"+numeroUsuario+",1 ,92911, newId(), 0 );");
-
-
-
-        } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "Error al insertar en asistencias", Toast.LENGTH_SHORT).show();
-        }
-    }
 
 
 
@@ -413,147 +290,123 @@ public class ActPrincipal extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Error al obtener datos del usuario", Toast.LENGTH_SHORT).show();
         }
     }
-    public void InsertarZona(String zona){
-
-
-        ConexionSQLiteHelper conn = new ConexionSQLiteHelper(this, "db tienda", null, 1);
-        SQLiteDatabase db=conn.getWritableDatabase();
 
 
 
 
 
-        db.execSQL("INSERT INTO  zona  (zona) VALUES('"+zona+"')");
 
+
+
+    public String obtenerCaja(){
+
+        String caja="";
+        ConexionSQLiteHelper conn = new ConexionSQLiteHelper(getApplicationContext(), "db tienda", null, 1);
+        SQLiteDatabase db = conn.getReadableDatabase();
+
+        String sql="SELECT nombreCaja FROM caja where id=1 order by id desc";
+        Cursor cursor = db.rawQuery(sql, null);
+        while (cursor.moveToNext()) {
+            caja=(cursor.getString(0));
+
+
+        }
+
+        return caja;
     }
 
-    public void insertarAreaAsignada(){
-        String id=getArea();
-        try {
-
-            if(check.isChecked()==true){
-                id="-1";
+    public static int obtenerPosicionItem(Spinner spinner, String fruta) {
+        //Creamos la variable posicion y lo inicializamos en 0
+        int posicion = 0;
+        //Recorre el spinner en busca del ítem que coincida con el parametro `String fruta`
+        //que lo pasaremos posteriormente
+        for (int i = 0; i < spinner.getCount(); i++) {
+            //Almacena la posición del ítem que coincida con la búsqueda
+            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(fruta)) {
+                posicion = i;
             }
-            Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="insert into AreasAsignadas (idTienda,idArea,idEmpleado,Fecha,Hora) values ("+numeroTienda+",'"+id+"',"+numeroUsuario+",getDate(),getDate());";
-            st.executeQuery(sql);
-
-
-        } catch (Exception e) {
-
         }
+        //Devuelve un valor entero (si encontro una coincidencia devuelve la
+        // posición 0 o N, de lo contrario devuelve 0 = posición inicial)
+        return posicion;
     }
 
-    public String getArea(){
-        String id=null;
-        try {
-            Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="select idArea from areasdecontrol where nombre='"+spZona.getSelectedItem().toString()+"'";
-            ResultSet rs=st.executeQuery(sql);
 
-            while(rs.next()){
-                id=rs.getString(1);
+
+
+
+
+    Thread insertarEntrada = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            try {
+                Statement st = bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
+                st.executeUpdate("insert into logdia (nombre, fecha, tienda, hora,origen, tipo, idEmpleado, caja, id, llave, autoriza) values ('"+nombreUsuario+"', getDate(),1,'getDate()', 1, 'ENTRADA',"+numeroUsuario+",1 ,92911, newId(), 0 );");
+                st.close();
+
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(), "Error al insertar en asistencias", Toast.LENGTH_SHORT).show();
             }
 
-        } catch (Exception e) {
+        }
+    });
+
+    Thread actualizar = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            SQLiteDatabase db=conn.getReadableDatabase();
+            String[] parametros={"1"};
+            ContentValues values=new ContentValues();
+            try {
+                values.put(Utilidades.CAMPOS_NOMBRE,numeroTienda);
+                db.update(Utilidades.TABLA_TIENDA,values,Utilidades.CAMPO_ID+"=?",parametros);
+                db.close();
+            }catch (Exception e){
+                Toast.makeText(getApplicationContext(),"no pos no" , Toast.LENGTH_LONG).show();
+            }
 
         }
-        return id;
-    }
+    });
 
 
-    public void crearComanderoTabla(){
+    Thread guardarCaja = new Thread(new Runnable() {
+        @Override
+        public void run() {
 
-        try{
-            Statement st=bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="Create table comandero(numero varchar(50), tienda numeric(5,0), cliente nvarchar(50), fecha date, total decimal(18,2), status nchar(1), pares numeric(4,0), empleado varchar(50), impreso bit, llave uniqueidentifier);";
-            st.executeUpdate(sql);
-        }catch (SQLException e){
-            e.getMessage();
-            Toast.makeText(getApplicationContext(),"No se puede crear la tabla Comandero",Toast.LENGTH_LONG);
+
+            try {
+                ConexionSQLiteHelper conn = new ConexionSQLiteHelper(getApplicationContext(), "db tienda", null, 1);
+                SQLiteDatabase db = conn.getWritableDatabase();
+
+
+                db.execSQL("INSERT INTO  caja  (nombreCaja) VALUES('" + edtCaja.getText().toString() + "')");
+                db.close();
+            }catch (Exception e){
+                Toast toast = Toast.makeText(getApplication(), "La versión nueva de SazMobile POS se ha instalado", Toast.LENGTH_LONG);
+                TextView x = (TextView) toast.getView().findViewById(android.R.id.message);
+                x.setTextColor(Color.YELLOW); toast.show();
+                Intent intent = new Intent(getApplicationContext(), Principal.class);
+                startActivity(intent);
+                getApplicationContext().deleteDatabase("db tienda");
+
+
+
+            } finally {
+
+
+
+
+            }
         }
-
-    }
-
-    public void crearAreasTabla(){
-
-        try{
-            Statement st=bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="Create table AreasDeControl(idArea numeric(18,0) IDENTITY, idTienda numeric(18,0), nombre nchar(50));";
-            st.executeUpdate(sql);
-        }catch (SQLException e){
-            e.getMessage();
-            Toast.makeText(getApplicationContext(),"No se puede crear la tabla AreasDeControl ",Toast.LENGTH_LONG);
-        }
-
-    }
-
-    public void crearZonaTabla(){
-
-        try{
-            Statement st=bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="Create table AreasDeControl (idZona numeric(18,0) IDENTITY, idTienda nvarchar(50), nombre nchar(50), idArea numeric(18, 0))";
-            st.executeUpdate(sql);
-        }catch (SQLException e){
-            e.getMessage();
-            Toast.makeText(getApplicationContext(),"No se puede crear la tabla AreasDeControl ",Toast.LENGTH_LONG);
-        }
-
-    }
-
-
-    public void crearAreaAsignadaTabla(){
-        try{
-            Statement st=bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="Create table AreasAsignadas (idTienda numeric(18,0), idArea nvarchar(50), idEmpleado numeric(18,0), fecha date, hora time(2))";
-            st.executeUpdate(sql);
-        }catch (SQLException e){
-            e.getMessage();
-            Toast.makeText(getApplicationContext(),"No se puede crear la tabla AreasDeControl ",Toast.LENGTH_LONG);
-        }
-    }
-
-    public void crearUbicacionTabla(){
-        try{
-            Statement st=bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="Create table UbicacionesProductos (idTienda numeric(18,0), idZona numeric(18,0), barcode nvarchar(50), id numeric(18,0) IDENTITY, hora time(2))";
-            st.executeUpdate(sql);
-        }catch (Exception e){
-            e.getMessage();
-        }
-    }
-
-
-    public void crearComanderoDet(){
-        try{
-            Statement st=bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="Create table comanderoDet (numero varchar(50), tienda numeric(5,0), barcode nvarchar(50), estilo nvarchar(50),color nvarchar(50), marca nvarchar(50), acabado nvarchar(50), talla decimal(4,1), status char(1), ubicacion nvarchar(50), llave uniqueidentifier)";
-            st.executeUpdate(sql);
-        }catch (Exception e ){
-            e.getMessage();
-        }
-    }
-
-
-
-    public void crearComanderoLog(){
-        try{
-            Statement st=bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="Create table comanderoLog (numero varchar(50), fecha date, hora time(7), llave uniqueidentifier)";
-            st.executeUpdate(sql);
-        }catch (Exception e ){
-            e.getMessage();
-        }
-    }
-
-
+    });
 
 
     public void dropSP(){
         try{
             Statement st=bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="drop procedure lupita";
+            String sql="drop procedure lupitaApartados";
             st.executeUpdate(sql);
+            st.close();
         }catch (Exception e ){
             e.getMessage();
         }
@@ -563,10 +416,10 @@ public class ActPrincipal extends AppCompatActivity {
     public void crearSp(){
         try{
             Statement st=bdc.conexionBD(me.getServer(),me.getBase(),me.getUsuario(),me.getPass()).createStatement();
-            String sql="\n" +
-                    "CREATE PROCEDURE [dbo].[Lupita] @Barcode AS VARCHAR(8000) = NULL\n" +
+            String sql="CREATE PROCEDURE [dbo].[LupitaApartados] @Barcode AS VARCHAR(8000) = NULL\n" +
                     "\t,@TallaBusca AS VARCHAR(5)\n" +
-                    "\t,@TiendaBusca AS DECIMAL\n" +
+                    "\t,@TiendaBusca AS DECIMAL \n" +
+                    "\t,@FechaBusca AS VARCHAR(8)\n" +
                     "AS\n" +
                     "SET NOCOUNT ON\n" +
                     "\n" +
@@ -621,6 +474,7 @@ public class ActPrincipal extends AppCompatActivity {
                     "\n" +
                     "DECLARE @CompTalla AS NVARCHAR(MAX)\n" +
                     "DECLARE @CompTiend AS NVARCHAR(MAX)\n" +
+                    "DECLARE @CompFecha AS NVARCHAR(250)\n" +
                     "DECLARE @SiHay AS INT\n" +
                     "\n" +
                     "SET @SiHay = 0\n" +
@@ -643,7 +497,16 @@ public class ActPrincipal extends AppCompatActivity {
                     "\tSET @CompTiend = ' AND existen.TIENDA = ' + CAST(@TiendaBusca AS NVARCHAR(10))\n" +
                     "END\n" +
                     "\n" +
-                    "SET @SQL = 'SELECT existen.BARCODE, tiendas.NOMBRE AS Tienda, existen.TALLA, existen.CANTIDAD Into ##TempTallas FROM existen INNER JOIN tiendas ON existen.TIENDA = tiendas.NUMERO INNER JOIN  articulo ON existen.BARCODE = articulo.BARCODE INNER JOIN colores ON articulo.COLOR = colores.numero INNER JOIN acabados ON articulo.ACABADO = acabados.numero INNER JOIN marcas ON articulo.MARCA = marcas.numero INNER JOIN sublinea ON articulo.SUBLINEA = sublinea.numero INNER JOIN lineas ON articulo.LINEA = lineas.NUMERO inner join corridas on corridas.id=articulo.corrida inner join temporad on temporad.numero=articulo.temporad Where (Existen.Tienda In (Select Tienda From ##TempTienda)) And (Existen.Cantidad <> 0) ' + @CompTalla + @CompTiend + ' and articulo.barcode in(''' + @Barcode + ''')'\n" +
+                    "IF NOT NULLIF(@FechaBusca, '') IS NULL\n" +
+                    "BEGIN\n" +
+                    "    SET @CompFecha = ' AND detap.FECHA >= ''' + @FechaBusca + ''''\n" +
+                    "END\n" +
+                    "ELSE\n" +
+                    "BEGIN\n" +
+                    "    SET @CompFecha = ''\n" +
+                    "END\n" +
+                    "\n" +
+                    "SET @SQL = 'SELECT existen.BARCODE, tiendas.NOMBRE AS Tienda, existen.TALLA, ISNULL(existen.CANTIDAD, 0) - ISNULL(existen.CANTREAL, 0) - (SELECT ISNULL(SUM(CANTIDAD), 0) AS CUANTOS FROM detap WHERE BARCODE = existen.BARCODE AND PUNTO = existen.TALLA AND TIENDA = existen.TIENDA) AS CANTIDAD Into ##TempTallas FROM existen LEFT JOIN tiendas ON existen.TIENDA = tiendas.NUMERO Where (Existen.Tienda In (Select Tienda From ##TempTienda)) And (Existen.Cantidad <> 0) ' + @CompTalla + @CompTiend + ' and existen.barcode in(''' + @Barcode + ''') GROUP BY existen.BARCODE, tiendas.NOMBRE, existen.TALLA, existen.TIENDA, Existen.Cantidad, existen.CANTREAL ORDER BY existen.BARCODE, existen.TALLA'\n" +
                     "EXECUTE (@SQL)\n" +
                     "\n" +
                     "SET @sql = 'DECLARE temp_cursor CURSOR FOR SELECT Distinct existen.TALLA FROM existen INNER JOIN tiendas ON existen.TIENDA = tiendas.NUMERO INNER JOIN articulo ON existen.BARCODE = articulo.BARCODE INNER JOIN colores ON articulo.COLOR = colores.numero INNER JOIN acabados ON articulo.ACABADO = acabados.numero INNER JOIN marcas ON articulo.MARCA = marcas.numero INNER JOIN sublinea ON articulo.SUBLINEA = sublinea.numero INNER JOIN lineas ON articulo.LINEA = lineas.NUMERO inner join corridas on corridas.id=articulo.corrida Where (Existen.Tienda In (Select Tienda From ##TempTienda)) And (Existen.Cantidad <> 0) and articulo.barcode in( ''' + @Barcode + ''') ' + @CompTalla + @CompTiend + ' Order by Talla'\n" +
@@ -732,63 +595,6 @@ public class ActPrincipal extends AppCompatActivity {
     }
 
 
-    public void guardarCaja(){
 
-        try {
-            ConexionSQLiteHelper conn = new ConexionSQLiteHelper(this, "db tienda", null, 1);
-            SQLiteDatabase db = conn.getWritableDatabase();
-
-
-            db.execSQL("INSERT INTO  caja  (nombreCaja) VALUES('" + edtCaja.getText().toString() + "')");
-        }catch (Exception e){
-            Toast toast = Toast.makeText(getApplication(), "La versión nueva de SazMobile POS se ha instalado", Toast.LENGTH_LONG);
-            TextView x = (TextView) toast.getView().findViewById(android.R.id.message);
-            x.setTextColor(Color.YELLOW); toast.show();
-            Intent intent = new Intent(getApplicationContext(), Principal.class);
-            startActivity(intent);
-            getApplicationContext().deleteDatabase("db tienda");
-
-
-
-        } finally {
-
-
-
-
-        }
-    }
-
-    public String obtenerCaja(){
-
-        String caja="";
-        ConexionSQLiteHelper conn = new ConexionSQLiteHelper(getApplicationContext(), "db tienda", null, 1);
-        SQLiteDatabase db = conn.getReadableDatabase();
-
-        String sql="SELECT nombreCaja FROM caja where id=1 order by id desc";
-        Cursor cursor = db.rawQuery(sql, null);
-        while (cursor.moveToNext()) {
-            caja=(cursor.getString(0));
-
-
-        }
-
-        return caja;
-    }
-
-    public static int obtenerPosicionItem(Spinner spinner, String fruta) {
-        //Creamos la variable posicion y lo inicializamos en 0
-        int posicion = 0;
-        //Recorre el spinner en busca del ítem que coincida con el parametro `String fruta`
-        //que lo pasaremos posteriormente
-        for (int i = 0; i < spinner.getCount(); i++) {
-            //Almacena la posición del ítem que coincida con la búsqueda
-            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(fruta)) {
-                posicion = i;
-            }
-        }
-        //Devuelve un valor entero (si encontro una coincidencia devuelve la
-        // posición 0 o N, de lo contrario devuelve 0 = posición inicial)
-        return posicion;
-    }
 
 }
